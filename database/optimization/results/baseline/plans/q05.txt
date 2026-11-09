@@ -1,0 +1,39 @@
+-- q05. Retraction-reason occurrence coverage by exact source label. (captured in round 1)
+
+SELECT
+    rr.source_label AS retraction_reason,
+    COUNT(DISTINCT sr.source_record_id) AS records_with_reason
+FROM analyst_source_record AS sr
+JOIN analyst_retraction_notice AS n
+    ON n.source_record_id = sr.source_record_id
+JOIN analyst_retraction_reason_occurrence AS rro
+    ON rro.retraction_notice_id = n.retraction_notice_id
+JOIN analyst_retraction_reason AS rr
+    ON rr.retraction_reason_id = rro.retraction_reason_id
+GROUP BY rr.source_label
+ORDER BY records_with_reason DESC, retraction_reason;
+
+== EXPLAIN
++----+-------------+------------------------------+------------+--------+------------------------------------------------+------------------------------------+---------+------------------------------------------------------------------------+-------+----------+----------------------------------------------+
+| id | select_type | table                        | partitions | type   | possible_keys                                  | key                                | key_len | ref                                                                    | rows  | filtered | Extra                                        |
++----+-------------+------------------------------+------------+--------+------------------------------------------------+------------------------------------+---------+------------------------------------------------------------------------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | source_record                | NULL       | index  | PRIMARY                                        | source_record_etl_batch_fk         | 8       | NULL                                                                   | 65662 | 100.0    | Using index; Using temporary; Using filesort |
+| 1  | SIMPLE      | retraction_notice            | NULL       | eq_ref | PRIMARY,retraction_notice_source_record_uq     | retraction_notice_source_record_uq | 8       | academic_retractions.source_record.source_record_id                    | 1     | 100.0    | Using index                                  |
+| 1  | SIMPLE      | retraction_reason_occurrence | NULL       | ref    | PRIMARY,retraction_reason_occurrence_reason_ix | PRIMARY                            | 8       | academic_retractions.retraction_notice.retraction_notice_id            | 4     | 100.0    | NULL                                         |
+| 1  | SIMPLE      | retraction_reason            | NULL       | eq_ref | PRIMARY,retraction_reason_source_label_uq      | PRIMARY                            | 8       | academic_retractions.retraction_reason_occurrence.retraction_reason_id | 1     | 100.0    | NULL                                         |
++----+-------------+------------------------------+------------+--------+------------------------------------------------+------------------------------------+---------+------------------------------------------------------------------------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: records_with_reason DESC, rr.retraction_reason  (actual time=918..918 rows=109 loops=1)
+    -> Stream results  (actual time=860..917 rows=109 loops=1)
+        -> Group aggregate: count(distinct source_record.source_record_id)  (actual time=860..917 rows=109 loops=1)
+            -> Sort: rr.retraction_reason  (actual time=859..868 rows=261851 loops=1)
+                -> Stream results  (cost=166351 rows=267124) (actual time=0.297..378 rows=261851 loops=1)
+                    -> Nested loop inner join  (cost=166351 rows=267124) (actual time=0.296..334 rows=261851 loops=1)
+                        -> Nested loop inner join  (cost=72857 rows=267124) (actual time=0.293..181 rows=261851 loops=1)
+                            -> Nested loop inner join  (cost=29652 rows=65662) (actual time=0.289..60.5 rows=65909 loops=1)
+                                -> Covering index scan on source_record using source_record_etl_batch_fk  (cost=6670 rows=65662) (actual time=0.28..6.75 rows=65909 loops=1)
+                                -> Single-row covering index lookup on retraction_notice using retraction_notice_source_record_uq (source_record_id=source_record.source_record_id)  (cost=0.25 rows=1) (actual time=709e-6..724e-6 rows=1 loops=65909)
+                            -> Index lookup on retraction_reason_occurrence using PRIMARY (retraction_notice_id=retraction_notice.retraction_notice_id)  (cost=0.251 rows=4.07) (actual time=0.00106..0.00163 rows=3.97 loops=65909)
+                        -> Single-row index lookup on retraction_reason using PRIMARY (retraction_reason_id=retraction_reason_occurrence.retraction_reason_id)  (cost=0.25 rows=1) (actual time=482e-6..498e-6 rows=1 loops=261851)
+

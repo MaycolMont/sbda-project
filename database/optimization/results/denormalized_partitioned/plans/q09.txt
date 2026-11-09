@@ -1,0 +1,55 @@
+-- q09. Five most common journal labels per recorded retraction year. (captured in round 1)
+
+WITH journal_counts AS (
+    SELECT
+        retraction_year,
+        journal_name,
+        COUNT(*) AS retraction_record_count
+    FROM retraction_summary
+    WHERE retraction_date IS NOT NULL
+      AND journal_name IS NOT NULL
+    GROUP BY retraction_year, journal_name
+),
+ranked_journals AS (
+    SELECT
+        retraction_year,
+        journal_name,
+        retraction_record_count,
+        ROW_NUMBER() OVER (
+            PARTITION BY retraction_year
+            ORDER BY retraction_record_count DESC, journal_name
+        ) AS journal_rank
+    FROM journal_counts
+)
+SELECT
+    retraction_year,
+    journal_name,
+    retraction_record_count,
+    journal_rank
+FROM ranked_journals
+WHERE journal_rank <= 5
+ORDER BY retraction_year, journal_rank, journal_name;
+
+== EXPLAIN
++----+-------------+--------------------+------------------------------------------------------------------------------------------------------+------+---------------+------+---------+------+-------+----------+------------------------------+
+| id | select_type | table              | partitions                                                                                           | type | possible_keys | key  | key_len | ref  | rows  | filtered | Extra                        |
++----+-------------+--------------------+------------------------------------------------------------------------------------------------------+------+---------------+------+---------+------+-------+----------+------------------------------+
+| 1  | PRIMARY     | <derived2>         | NULL                                                                                                 | ALL  | NULL          | NULL | NULL    | NULL | 58604 | 33.33    | Using where; Using filesort  |
+| 2  | DERIVED     | <derived3>         | NULL                                                                                                 | ALL  | NULL          | NULL | NULL    | NULL | 58604 | 100.0    | Using filesort               |
+| 3  | DERIVED     | retraction_summary | p_before_2010,p2010_2014,p2015_2016,p2017_2018,p2019,p2020,p2021,p2022,p2023,p2024,p2025,p_from_2026 | ALL  | NULL          | NULL | NULL    | NULL | 65116 | 90.0     | Using where; Using temporary |
++----+-------------+--------------------+------------------------------------------------------------------------------------------------------+------+---------------+------+---------+------+-------+----------+------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: ranked_journals.retraction_year, ranked_journals.journal_rank, ranked_journals.journal_name  (cost=2.6..2.6 rows=0) (actual time=81.1..81.1 rows=135 loops=1)
+    -> Filter: (ranked_journals.journal_rank <= 5)  (cost=2.5..2.5 rows=0) (actual time=79.4..81 rows=135 loops=1)
+        -> Table scan on ranked_journals  (cost=2.5..2.5 rows=0) (actual time=79.4..80.6 rows=16668 loops=1)
+            -> Materialize CTE ranked_journals  (cost=0..0 rows=0) (actual time=79.4..79.4 rows=16668 loops=1)
+                -> Window aggregate: row_number() OVER (PARTITION BY journal_counts.retraction_year ORDER BY journal_counts.retraction_record_count desc,journal_counts.journal_name )   (actual time=73.7..76.9 rows=16668 loops=1)
+                    -> Sort: journal_counts.retraction_year, journal_counts.retraction_record_count DESC, journal_counts.journal_name  (cost=2.6..2.6 rows=0) (actual time=73.7..74.4 rows=16668 loops=1)
+                        -> Table scan on journal_counts  (cost=2.5..2.5 rows=0) (actual time=59.3..60.5 rows=16668 loops=1)
+                            -> Materialize CTE journal_counts  (cost=0..0 rows=0) (actual time=59.3..59.3 rows=16668 loops=1)
+                                -> Table scan on <temporary>  (actual time=55.7..57.2 rows=16668 loops=1)
+                                    -> Aggregate using temporary table  (actual time=55.7..55.7 rows=16668 loops=1)
+                                        -> Filter: (retraction_summary.journal_name is not null)  (cost=6798 rows=58604) (actual time=0.0274..16.9 rows=65909 loops=1)
+                                            -> Table scan on retraction_summary  (cost=6798 rows=65116) (actual time=0.0268..14 rows=65909 loops=1)
+

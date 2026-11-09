@@ -1,0 +1,26 @@
+-- q03. Retraction records by year and first-listed subject. (captured in round 1)
+
+SELECT
+    retraction_year,
+    primary_subject_label AS primary_subject,
+    COUNT(*) AS retraction_record_count
+FROM retraction_summary
+WHERE retraction_date IS NOT NULL
+  AND primary_subject_label IS NOT NULL
+GROUP BY retraction_year, primary_subject_label
+ORDER BY retraction_year, retraction_record_count DESC, primary_subject;
+
+== EXPLAIN
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+| id | select_type | table              | partitions | type | possible_keys | key  | key_len | ref  | rows  | filtered | Extra                                        |
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | retraction_summary | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 65478 | 81.0     | Using where; Using temporary; Using filesort |
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: retraction_summary.retraction_year, retraction_record_count DESC, retraction_summary.primary_subject_label  (actual time=40.3..40.4 rows=2259 loops=1)
+    -> Table scan on <temporary>  (actual time=39.2..39.4 rows=2259 loops=1)
+        -> Aggregate using temporary table  (actual time=39.2..39.2 rows=2259 loops=1)
+            -> Filter: ((retraction_summary.retraction_date is not null) and (retraction_summary.primary_subject_label is not null))  (cost=6732 rows=53037) (actual time=0.0141..15.4 rows=65909 loops=1)
+                -> Table scan on retraction_summary  (cost=6732 rows=65478) (actual time=0.0135..12.2 rows=65909 loops=1)
+

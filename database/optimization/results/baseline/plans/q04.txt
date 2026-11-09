@@ -1,0 +1,48 @@
+-- q04. Retraction records by first-listed author/institution country label. (captured in round 1)
+
+SELECT
+    cl.source_label AS primary_country_label,
+    COUNT(DISTINCT sr.source_record_id) AS retraction_record_count
+FROM analyst_source_record AS sr
+JOIN analyst_publication AS p
+    ON p.source_record_id = sr.source_record_id
+JOIN analyst_retraction_notice AS n
+    ON n.source_record_id = sr.source_record_id
+JOIN analyst_publication_country_occurrence AS pco
+    ON pco.publication_id = p.publication_id
+   AND pco.is_primary = 1
+JOIN analyst_country_label AS cl
+    ON cl.country_label_id = pco.country_label_id
+WHERE n.retraction_date IS NOT NULL
+GROUP BY cl.source_label
+ORDER BY retraction_record_count DESC, primary_country_label;
+
+== EXPLAIN
++----+-------------+--------------------------------+------------+--------+---------------------------------------------------------+------------------------------------+---------+----------------------------------------------------------------------+-------+----------+----------------------------------------------+
+| id | select_type | table                          | partitions | type   | possible_keys                                           | key                                | key_len | ref                                                                  | rows  | filtered | Extra                                        |
++----+-------------+--------------------------------+------------+--------+---------------------------------------------------------+------------------------------------+---------+----------------------------------------------------------------------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | publication_country_occurrence | NULL       | ALL    | PRIMARY,publication_country_occurrence_country_label_ix | NULL                               | NULL    | NULL                                                                 | 81792 | 10.0     | Using where; Using temporary; Using filesort |
+| 1  | SIMPLE      | country_label                  | NULL       | eq_ref | PRIMARY,country_label_source_label_uq                   | PRIMARY                            | 8       | academic_retractions.publication_country_occurrence.country_label_id | 1     | 100.0    | NULL                                         |
+| 1  | SIMPLE      | publication                    | NULL       | eq_ref | PRIMARY,publication_source_record_uq                    | PRIMARY                            | 8       | academic_retractions.publication_country_occurrence.publication_id   | 1     | 100.0    | NULL                                         |
+| 1  | SIMPLE      | source_record                  | NULL       | eq_ref | PRIMARY                                                 | PRIMARY                            | 8       | academic_retractions.publication.source_record_id                    | 1     | 100.0    | Using index                                  |
+| 1  | SIMPLE      | retraction_notice              | NULL       | eq_ref | retraction_notice_source_record_uq                      | retraction_notice_source_record_uq | 8       | academic_retractions.publication.source_record_id                    | 1     | 90.0     | Using where                                  |
++----+-------------+--------------------------------+------------+--------+---------------------------------------------------------+------------------------------------+---------+----------------------------------------------------------------------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: retraction_record_count DESC, cl.primary_country_label  (actual time=307..307 rows=162 loops=1)
+    -> Stream results  (actual time=296..307 rows=162 loops=1)
+        -> Group aggregate: count(distinct source_record.source_record_id)  (actual time=296..306 rows=162 loops=1)
+            -> Sort: cl.primary_country_label  (actual time=296..298 rows=65102 loops=1)
+                -> Stream results  (cost=19686 rows=7361) (actual time=0.404..206 rows=65102 loops=1)
+                    -> Nested loop inner join  (cost=19686 rows=7361) (actual time=0.403..197 rows=65102 loops=1)
+                        -> Nested loop inner join  (cost=16824 rows=8179) (actual time=0.397..116 rows=65102 loops=1)
+                            -> Nested loop inner join  (cost=13961 rows=8179) (actual time=0.395..83.1 rows=65102 loops=1)
+                                -> Nested loop inner join  (cost=11098 rows=8179) (actual time=0.393..40.7 rows=65102 loops=1)
+                                    -> Filter: (publication_country_occurrence.is_primary = 1)  (cost=8235 rows=8179) (actual time=0.386..15 rows=65102 loops=1)
+                                        -> Table scan on publication_country_occurrence  (cost=8235 rows=81792) (actual time=0.385..10.7 rows=81729 loops=1)
+                                    -> Single-row index lookup on country_label using PRIMARY (country_label_id=publication_country_occurrence.country_label_id)  (cost=0.25 rows=1) (actual time=299e-6..313e-6 rows=1 loops=65102)
+                                -> Single-row index lookup on publication using PRIMARY (publication_id=publication_country_occurrence.publication_id)  (cost=0.25 rows=1) (actual time=556e-6..571e-6 rows=1 loops=65102)
+                            -> Single-row covering index lookup on source_record using PRIMARY (source_record_id=publication.source_record_id)  (cost=0.25 rows=1) (actual time=412e-6..426e-6 rows=1 loops=65102)
+                        -> Filter: (retraction_notice.retraction_date is not null)  (cost=0.25 rows=0.9) (actual time=0.00112..0.00116 rows=1 loops=65102)
+                            -> Single-row index lookup on retraction_notice using retraction_notice_source_record_uq (source_record_id=publication.source_record_id)  (cost=0.25 rows=1) (actual time=0.00103..0.00105 rows=1 loops=65102)
+

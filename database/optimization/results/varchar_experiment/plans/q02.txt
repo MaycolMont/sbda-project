@@ -1,0 +1,38 @@
+-- q02. Journals with the most source records; exact source labels are not canonicalized. (captured in round 1)
+
+SELECT
+    p.journal_name,
+    COUNT(DISTINCT sr.source_record_id) AS retraction_record_count
+FROM analyst_publication AS p
+JOIN analyst_source_record AS sr
+    ON sr.source_record_id = p.source_record_id
+JOIN analyst_retraction_notice AS n
+    ON n.source_record_id = sr.source_record_id
+WHERE p.journal_name IS NOT NULL
+  AND n.retraction_date IS NOT NULL
+GROUP BY p.journal_name
+ORDER BY retraction_record_count DESC, p.journal_name
+LIMIT 20;
+
+== EXPLAIN
++----+-------------+-------------------+------------+--------+----------------------------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+-----------------------------------------------------------+
+| id | select_type | table             | partitions | type   | possible_keys                                            | key                                | key_len | ref                                               | rows  | filtered | Extra                                                     |
++----+-------------+-------------------+------------+--------+----------------------------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+-----------------------------------------------------------+
+| 1  | SIMPLE      | publication       | NULL       | index  | publication_source_record_uq,publication_journal_name_ix | publication_journal_name_ix        | 2059    | NULL                                              | 64518 | 50.0     | Using where; Using index; Using temporary; Using filesort |
+| 1  | SIMPLE      | source_record     | NULL       | eq_ref | PRIMARY                                                  | PRIMARY                            | 8       | academic_retractions.publication.source_record_id | 1     | 100.0    | Using index                                               |
+| 1  | SIMPLE      | retraction_notice | NULL       | eq_ref | retraction_notice_source_record_uq                       | retraction_notice_source_record_uq | 8       | academic_retractions.publication.source_record_id | 1     | 90.0     | Using where                                               |
++----+-------------+-------------------+------------+--------+----------------------------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+-----------------------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Limit: 20 row(s)  (actual time=170..170 rows=20 loops=1)
+    -> Sort: retraction_record_count DESC, p.journal_name, limit input to 20 row(s) per chunk  (actual time=170..170 rows=20 loops=1)
+        -> Stream results  (cost=32201 rows=170) (actual time=0.0384..167 rows=8449 loops=1)
+            -> Group aggregate: count(distinct source_record.source_record_id)  (cost=32201 rows=170) (actual time=0.0368..166 rows=8449 loops=1)
+                -> Nested loop inner join  (cost=29298 rows=29033) (actual time=0.022..142 rows=65909 loops=1)
+                    -> Nested loop inner join  (cost=18007 rows=32259) (actual time=0.0161..51.2 rows=65909 loops=1)
+                        -> Filter: (publication.journal_name is not null)  (cost=6717 rows=32259) (actual time=0.0113..13.4 rows=65909 loops=1)
+                            -> Covering index scan on publication using publication_journal_name_ix  (cost=6717 rows=64518) (actual time=0.0108..10.2 rows=65909 loops=1)
+                        -> Single-row covering index lookup on source_record using PRIMARY (source_record_id=publication.source_record_id)  (cost=0.25 rows=1) (actual time=473e-6..489e-6 rows=1 loops=65909)
+                    -> Filter: (retraction_notice.retraction_date is not null)  (cost=0.25 rows=0.9) (actual time=0.00124..0.00129 rows=1 loops=65909)
+                        -> Single-row index lookup on retraction_notice using retraction_notice_source_record_uq (source_record_id=publication.source_record_id)  (cost=0.25 rows=1) (actual time=0.00115..0.00117 rows=1 loops=65909)
+

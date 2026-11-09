@@ -1,0 +1,54 @@
+-- q10. Recorded date intervals by primary subject for 2015-2025; (captured in round 1)
+
+SELECT
+    sa.source_label AS primary_subject,
+    COUNT(DISTINCT sr.source_record_id) AS retraction_record_count,
+    AVG(DATEDIFF(n.retraction_date, p.original_paper_date))
+        AS average_recorded_day_difference
+FROM analyst_source_record AS sr
+JOIN analyst_publication AS p
+    ON p.source_record_id = sr.source_record_id
+JOIN analyst_retraction_notice AS n
+    ON n.source_record_id = sr.source_record_id
+JOIN analyst_publication_subject_occurrence AS pso
+    ON pso.publication_id = p.publication_id
+   AND pso.is_primary = 1
+JOIN analyst_subject_area AS sa
+    ON sa.subject_area_id = pso.subject_area_id
+WHERE n.retraction_date >= '2015-01-01'
+  AND n.retraction_date < '2026-01-01'
+  AND p.original_paper_date IS NOT NULL
+  AND n.retraction_date >= p.original_paper_date
+GROUP BY sa.source_label
+ORDER BY retraction_record_count DESC, primary_subject;
+
+== EXPLAIN
++----+-------------+--------------------------------+------------+--------+--------------------------------------------------------+------------------------------+---------+---------------------------------------------------------------------+-------+----------+----------------------------------------------+
+| id | select_type | table                          | partitions | type   | possible_keys                                          | key                          | key_len | ref                                                                 | rows  | filtered | Extra                                        |
++----+-------------+--------------------------------+------------+--------+--------------------------------------------------------+------------------------------+---------+---------------------------------------------------------------------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | retraction_notice              | NULL       | ALL    | retraction_notice_source_record_uq                     | NULL                         | NULL    | NULL                                                                | 66069 | 11.11    | Using where; Using temporary; Using filesort |
+| 1  | SIMPLE      | publication                    | NULL       | eq_ref | PRIMARY,publication_source_record_uq                   | publication_source_record_uq | 8       | academic_retractions.retraction_notice.source_record_id             | 1     | 30.0     | Using where                                  |
+| 1  | SIMPLE      | publication_subject_occurrence | NULL       | ref    | PRIMARY,publication_subject_occurrence_subject_area_ix | PRIMARY                      | 8       | academic_retractions.publication.publication_id                     | 2     | 10.0     | Using where                                  |
+| 1  | SIMPLE      | subject_area                   | NULL       | eq_ref | PRIMARY,subject_area_source_label_uq                   | PRIMARY                      | 8       | academic_retractions.publication_subject_occurrence.subject_area_id | 1     | 100.0    | NULL                                         |
+| 1  | SIMPLE      | source_record                  | NULL       | eq_ref | PRIMARY                                                | PRIMARY                      | 8       | academic_retractions.retraction_notice.source_record_id             | 1     | 100.0    | Using index                                  |
++----+-------------+--------------------------------+------------+--------+--------------------------------------------------------+------------------------------+---------+---------------------------------------------------------------------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: retraction_record_count DESC, sa.primary_subject  (actual time=305..305 rows=129 loops=1)
+    -> Stream results  (actual time=294..305 rows=129 loops=1)
+        -> Group aggregate: count(distinct source_record.source_record_id), avg(tmp_field)  (actual time=294..305 rows=129 loops=1)
+            -> Sort: sa.primary_subject  (actual time=293..295 rows=48200 loops=1)
+                -> Stream results  (cost=11402 rows=619) (actual time=0.0457..226 rows=48200 loops=1)
+                    -> Nested loop inner join  (cost=11402 rows=619) (actual time=0.043..214 rows=48200 loops=1)
+                        -> Nested loop inner join  (cost=11185 rows=619) (actual time=0.041..188 rows=48200 loops=1)
+                            -> Nested loop inner join  (cost=10968 rows=619) (actual time=0.038..160 rows=48200 loops=1)
+                                -> Nested loop inner join  (cost=9248 rows=2202) (actual time=0.0336..84.9 rows=48200 loops=1)
+                                    -> Filter: ((retraction_notice.retraction_date >= DATE'2015-01-01') and (retraction_notice.retraction_date < DATE'2026-01-01'))  (cost=6679 rows=7340) (actual time=0.0219..15.4 rows=48200 loops=1)
+                                        -> Table scan on retraction_notice  (cost=6679 rows=66069) (actual time=0.0183..9.93 rows=65909 loops=1)
+                                    -> Filter: ((publication.original_paper_date is not null) and (retraction_notice.retraction_date >= publication.original_paper_date))  (cost=0.25 rows=0.3) (actual time=0.00129..0.00134 rows=1 loops=48200)
+                                        -> Single-row index lookup on publication using publication_source_record_uq (source_record_id=retraction_notice.source_record_id)  (cost=0.25 rows=1) (actual time=0.00117..0.00119 rows=1 loops=48200)
+                                -> Filter: (publication_subject_occurrence.is_primary = 1)  (cost=0.5 rows=0.281) (actual time=949e-6..0.00146 rows=1 loops=48200)
+                                    -> Index lookup on publication_subject_occurrence using PRIMARY (publication_id=publication.publication_id)  (cost=0.5 rows=2.81) (actual time=864e-6..0.00128 rows=2.83 loops=48200)
+                            -> Single-row index lookup on subject_area using PRIMARY (subject_area_id=publication_subject_occurrence.subject_area_id)  (cost=0.25 rows=1) (actual time=472e-6..488e-6 rows=1 loops=48200)
+                        -> Single-row covering index lookup on source_record using PRIMARY (source_record_id=retraction_notice.source_record_id)  (cost=0.25 rows=1) (actual time=443e-6..458e-6 rows=1 loops=48200)
+

@@ -1,0 +1,34 @@
+-- q08. Average difference between recorded dates by publication year. (captured in round 1)
+
+WITH recorded_intervals AS (
+    SELECT
+        source_record_id,
+        publication_year,
+        DATEDIFF(retraction_date, original_paper_date) AS recorded_day_difference
+    FROM retraction_summary
+    WHERE original_paper_date IS NOT NULL
+      AND retraction_date IS NOT NULL
+      AND retraction_date >= original_paper_date
+)
+SELECT
+    publication_year,
+    COUNT(*) AS retraction_record_count,
+    AVG(recorded_day_difference) AS average_recorded_day_difference
+FROM recorded_intervals
+GROUP BY publication_year
+ORDER BY publication_year;
+
+== EXPLAIN
++----+-------------+--------------------+------------------------------------------------------------------------------------------------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+| id | select_type | table              | partitions                                                                                           | type | possible_keys | key  | key_len | ref  | rows  | filtered | Extra                                        |
++----+-------------+--------------------+------------------------------------------------------------------------------------------------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | retraction_summary | p_before_2010,p2010_2014,p2015_2016,p2017_2018,p2019,p2020,p2021,p2022,p2023,p2024,p2025,p_from_2026 | ALL  | NULL          | NULL | NULL    | NULL | 65116 | 30.0     | Using where; Using temporary; Using filesort |
++----+-------------+--------------------+------------------------------------------------------------------------------------------------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: recorded_intervals.publication_year  (actual time=30.3..30.4 rows=26 loops=1)
+    -> Table scan on <temporary>  (actual time=30.3..30.3 rows=26 loops=1)
+        -> Aggregate using temporary table  (actual time=30.3..30.3 rows=26 loops=1)
+            -> Filter: ((retraction_summary.original_paper_date is not null) and (retraction_summary.retraction_date >= retraction_summary.original_paper_date))  (cost=6798 rows=19533) (actual time=0.278..14.6 rows=65909 loops=1)
+                -> Table scan on retraction_summary  (cost=6798 rows=65116) (actual time=0.276..10.5 rows=65909 loops=1)
+

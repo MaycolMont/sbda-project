@@ -1,0 +1,67 @@
+-- q09. Five most common journal labels per recorded retraction year. (captured in round 1)
+
+WITH journal_counts AS (
+    SELECT
+        YEAR(n.retraction_date) AS retraction_year,
+        p.journal_name,
+        COUNT(DISTINCT sr.source_record_id) AS retraction_record_count
+    FROM analyst_source_record AS sr
+    JOIN analyst_publication AS p
+        ON p.source_record_id = sr.source_record_id
+    JOIN analyst_retraction_notice AS n
+        ON n.source_record_id = sr.source_record_id
+    WHERE n.retraction_date IS NOT NULL
+      AND p.journal_name IS NOT NULL
+    GROUP BY YEAR(n.retraction_date), p.journal_name
+),
+ranked_journals AS (
+    SELECT
+        retraction_year,
+        journal_name,
+        retraction_record_count,
+        ROW_NUMBER() OVER (
+            PARTITION BY retraction_year
+            ORDER BY retraction_record_count DESC, journal_name
+        ) AS journal_rank
+    FROM journal_counts
+)
+SELECT
+    retraction_year,
+    journal_name,
+    retraction_record_count,
+    journal_rank
+FROM ranked_journals
+WHERE journal_rank <= 5
+ORDER BY retraction_year, journal_rank, journal_name;
+
+== EXPLAIN
++----+-------------+-------------------+------------+--------+----------------------------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+-----------------------------------------------------------+
+| id | select_type | table             | partitions | type   | possible_keys                                            | key                                | key_len | ref                                               | rows  | filtered | Extra                                                     |
++----+-------------+-------------------+------------+--------+----------------------------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+-----------------------------------------------------------+
+| 1  | PRIMARY     | <derived2>        | NULL       | ALL    | NULL                                                     | NULL                               | NULL    | NULL                                              | 29173 | 33.33    | Using where; Using filesort                               |
+| 2  | DERIVED     | <derived3>        | NULL       | ALL    | NULL                                                     | NULL                               | NULL    | NULL                                              | 29173 | 100.0    | Using filesort                                            |
+| 3  | DERIVED     | publication       | NULL       | index  | publication_source_record_uq,publication_journal_name_ix | publication_journal_name_ix        | 2059    | NULL                                              | 64831 | 50.0     | Using where; Using index; Using temporary; Using filesort |
+| 3  | DERIVED     | source_record     | NULL       | eq_ref | PRIMARY                                                  | PRIMARY                            | 8       | academic_retractions.publication.source_record_id | 1     | 100.0    | Using index                                               |
+| 3  | DERIVED     | retraction_notice | NULL       | eq_ref | retraction_notice_source_record_uq                       | retraction_notice_source_record_uq | 8       | academic_retractions.publication.source_record_id | 1     | 90.0     | Using where                                               |
++----+-------------+-------------------+------------+--------+----------------------------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+-----------------------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: ranked_journals.retraction_year, ranked_journals.journal_rank, ranked_journals.journal_name  (cost=2.6..2.6 rows=0) (actual time=305..305 rows=135 loops=1)
+    -> Filter: (ranked_journals.journal_rank <= 5)  (cost=2.5..2.5 rows=0) (actual time=303..305 rows=135 loops=1)
+        -> Table scan on ranked_journals  (cost=2.5..2.5 rows=0) (actual time=303..304 rows=16668 loops=1)
+            -> Materialize CTE ranked_journals  (cost=0..0 rows=0) (actual time=303..303 rows=16668 loops=1)
+                -> Window aggregate: row_number() OVER (PARTITION BY journal_counts.retraction_year ORDER BY journal_counts.retraction_record_count desc,journal_counts.journal_name )   (actual time=297..301 rows=16668 loops=1)
+                    -> Sort: journal_counts.retraction_year, journal_counts.retraction_record_count DESC, journal_counts.journal_name  (cost=2.6..2.6 rows=0) (actual time=297..298 rows=16668 loops=1)
+                        -> Table scan on journal_counts  (cost=2.5..2.5 rows=0) (actual time=284..286 rows=16668 loops=1)
+                            -> Materialize CTE journal_counts  (cost=0..0 rows=0) (actual time=284..284 rows=16668 loops=1)
+                                -> Group aggregate: count(distinct source_record.source_record_id)  (actual time=261..282 rows=16668 loops=1)
+                                    -> Sort: `year(retraction_notice.retraction_date)`, p.journal_name  (actual time=261..264 rows=65909 loops=1)
+                                        -> Stream results  (cost=29438 rows=29173) (actual time=0.0283..171 rows=65909 loops=1)
+                                            -> Nested loop inner join  (cost=29438 rows=29173) (actual time=0.0261..158 rows=65909 loops=1)
+                                                -> Nested loop inner join  (cost=18093 rows=32415) (actual time=0.0183..56.3 rows=65909 loops=1)
+                                                    -> Filter: (publication.journal_name is not null)  (cost=6748 rows=32415) (actual time=0.0126..13.5 rows=65909 loops=1)
+                                                        -> Covering index scan on publication using publication_journal_name_ix  (cost=6748 rows=64831) (actual time=0.0121..10.3 rows=65909 loops=1)
+                                                    -> Single-row covering index lookup on source_record using PRIMARY (source_record_id=publication.source_record_id)  (cost=0.25 rows=1) (actual time=548e-6..563e-6 rows=1 loops=65909)
+                                                -> Filter: (retraction_notice.retraction_date is not null)  (cost=0.25 rows=0.9) (actual time=0.00141..0.00146 rows=1 loops=65909)
+                                                    -> Single-row index lookup on retraction_notice using retraction_notice_source_record_uq (source_record_id=publication.source_record_id)  (cost=0.25 rows=1) (actual time=0.00132..0.00134 rows=1 loops=65909)
+

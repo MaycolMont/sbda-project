@@ -1,0 +1,39 @@
+-- q07. Publisher coverage by original publication year. (captured in round 1)
+
+SELECT
+    YEAR(p.original_paper_date) AS publication_year,
+    p.publisher_name,
+    COUNT(DISTINCT sr.source_record_id) AS retraction_record_count
+FROM analyst_source_record AS sr
+JOIN analyst_publication AS p
+    ON p.source_record_id = sr.source_record_id
+JOIN analyst_retraction_notice AS n
+    ON n.source_record_id = sr.source_record_id
+WHERE p.original_paper_date IS NOT NULL
+  AND p.publisher_name IS NOT NULL
+  AND n.retraction_date IS NOT NULL
+GROUP BY YEAR(p.original_paper_date), p.publisher_name
+ORDER BY publication_year, retraction_record_count DESC, p.publisher_name;
+
+== EXPLAIN
++----+-------------+-------------------+------------+--------+------------------------------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+-----------------------------------------------------------+
+| id | select_type | table             | partitions | type   | possible_keys                                              | key                                | key_len | ref                                               | rows  | filtered | Extra                                                     |
++----+-------------+-------------------+------------+--------+------------------------------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+-----------------------------------------------------------+
+| 1  | SIMPLE      | publication       | NULL       | index  | publication_source_record_uq,publication_publisher_name_ix | publication_publisher_name_ix      | 2063    | NULL                                              | 64831 | 45.0     | Using where; Using index; Using temporary; Using filesort |
+| 1  | SIMPLE      | source_record     | NULL       | eq_ref | PRIMARY                                                    | PRIMARY                            | 8       | academic_retractions.publication.source_record_id | 1     | 100.0    | Using index                                               |
+| 1  | SIMPLE      | retraction_notice | NULL       | eq_ref | retraction_notice_source_record_uq                         | retraction_notice_source_record_uq | 8       | academic_retractions.publication.source_record_id | 1     | 90.0     | Using where                                               |
++----+-------------+-------------------+------------+--------+------------------------------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+-----------------------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: publication_year, retraction_record_count DESC, p.publisher_name  (actual time=247..247 rows=4449 loops=1)
+    -> Stream results  (cost=40136 rows=1504) (actual time=91.4..243 rows=4449 loops=1)
+        -> Group aggregate: count(distinct source_record.source_record_id)  (cost=40136 rows=1504) (actual time=91.4..242 rows=4449 loops=1)
+            -> Nested loop inner join  (cost=34301 rows=58348) (actual time=91.4..221 rows=65909 loops=1)
+                -> Nested loop inner join  (cost=20524 rows=64831) (actual time=91.4..132 rows=65909 loops=1)
+                    -> Sort: `year(publication.original_paper_date)`, p.publisher_name  (cost=6748 rows=64831) (actual time=91.4..94.6 rows=65909 loops=1)
+                        -> Filter: ((publication.original_paper_date is not null) and (publication.publisher_name is not null))  (cost=6748 rows=64831) (actual time=0.0119..13.6 rows=65909 loops=1)
+                            -> Index scan on publication using publication_publisher_name_ix  (cost=6748 rows=64831) (actual time=0.0112..10.2 rows=65909 loops=1)
+                    -> Single-row covering index lookup on source_record using PRIMARY (source_record_id=publication.source_record_id)  (cost=0.25 rows=1) (actual time=460e-6..476e-6 rows=1 loops=65909)
+                -> Filter: (retraction_notice.retraction_date is not null)  (cost=0.25 rows=0.9) (actual time=0.00122..0.00127 rows=1 loops=65909)
+                    -> Single-row index lookup on retraction_notice using retraction_notice_source_record_uq (source_record_id=publication.source_record_id)  (cost=0.25 rows=1) (actual time=0.00114..0.00115 rows=1 loops=65909)
+

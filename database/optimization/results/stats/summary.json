@@ -1,0 +1,1034 @@
+{
+  "label": "stats",
+  "measured_at_utc": "2026-11-09T18:12:33+00:00",
+  "method": {
+    "cache": "warm (warm-up executions discarded; buffer pool holds the data set)",
+    "rounds": 3,
+    "warmup_executions": 2,
+    "timed_executions": 10,
+    "statistics_refreshed_each_round": true,
+    "session_settings": {},
+    "timing_scope": "client wall clock: execute + fetch all rows"
+  },
+  "environment": {
+    "mysql": {
+      "innodb_buffer_pool_size": "134217728",
+      "internal_tmp_mem_storage_engine": "TempTable",
+      "join_buffer_size": "262144",
+      "max_heap_table_size": "16777216",
+      "optimizer_switch": "index_merge=on,index_merge_union=on,index_merge_sort_union=on,index_merge_intersection=on,engine_condition_pushdown=on,index_condition_pushdown=on,mrr=on,mrr_cost_based=on,block_nested_loop=on,batched_key_access=off,materialization=on,semijoin=on,loosescan=on,firstmatch=on,duplicateweedout=on,subquery_materialization_cost_based=on,use_index_extensions=on,condition_fanout_filter=on,derived_merge=on,use_invisible_indexes=off,skip_scan=on,hash_join=on,subquery_to_derived=off,prefer_ordering_index=on,hypergraph_optimizer=off,derived_condition_pushdown=on",
+      "sort_buffer_size": "262144",
+      "tmp_table_size": "16777216",
+      "version": "8.0.46"
+    },
+    "client_platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+    "client_python": "3.12.3",
+    "cpu_count": 20,
+    "git": {
+      "commit": "594b40fd99e8d46c683e0bed16c65bc1c8129a72",
+      "dirty": true
+    }
+  },
+  "inventory": {
+    "row_counts": {
+      "article_type": 26,
+      "country_label": 183,
+      "etl_batch": 1,
+      "etl_record_issue": 1026,
+      "publication": 65909,
+      "publication_article_type_occurrence": 67738,
+      "publication_author_occurrence": 271390,
+      "publication_country_occurrence": 81729,
+      "publication_subject_occurrence": 179552,
+      "retraction_notice": 65909,
+      "retraction_reason": 109,
+      "retraction_reason_occurrence": 261851,
+      "source_misconduct_flag": 65909,
+      "source_record": 65909,
+      "subject_area": 130
+    },
+    "indexes": [
+      {
+        "table": "article_type",
+        "index": "article_type_source_label_uq",
+        "columns": "source_label"
+      },
+      {
+        "table": "article_type",
+        "index": "PRIMARY",
+        "columns": "article_type_id"
+      },
+      {
+        "table": "country_label",
+        "index": "country_label_source_label_uq",
+        "columns": "source_label"
+      },
+      {
+        "table": "country_label",
+        "index": "PRIMARY",
+        "columns": "country_label_id"
+      },
+      {
+        "table": "etl_batch",
+        "index": "etl_batch_import_attempt_uq",
+        "columns": "staging_import_batch_id, attempt_number"
+      },
+      {
+        "table": "etl_batch",
+        "index": "PRIMARY",
+        "columns": "etl_batch_id"
+      },
+      {
+        "table": "etl_record_issue",
+        "index": "etl_record_issue_batch_row_ix",
+        "columns": "etl_batch_id, source_row_number"
+      },
+      {
+        "table": "etl_record_issue",
+        "index": "etl_record_issue_batch_severity_ix",
+        "columns": "etl_batch_id, issue_severity"
+      },
+      {
+        "table": "etl_record_issue",
+        "index": "PRIMARY",
+        "columns": "etl_record_issue_id"
+      },
+      {
+        "table": "publication",
+        "index": "PRIMARY",
+        "columns": "publication_id"
+      },
+      {
+        "table": "publication",
+        "index": "publication_source_record_uq",
+        "columns": "source_record_id"
+      },
+      {
+        "table": "publication_article_type_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, article_type_ordinal"
+      },
+      {
+        "table": "publication_article_type_occurrence",
+        "index": "publication_article_type_occurrence_article_type_ix",
+        "columns": "article_type_id"
+      },
+      {
+        "table": "publication_author_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, author_ordinal"
+      },
+      {
+        "table": "publication_country_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, country_ordinal"
+      },
+      {
+        "table": "publication_country_occurrence",
+        "index": "publication_country_occurrence_country_label_ix",
+        "columns": "country_label_id"
+      },
+      {
+        "table": "publication_subject_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, subject_ordinal"
+      },
+      {
+        "table": "publication_subject_occurrence",
+        "index": "publication_subject_occurrence_subject_area_ix",
+        "columns": "subject_area_id"
+      },
+      {
+        "table": "retraction_notice",
+        "index": "PRIMARY",
+        "columns": "retraction_notice_id"
+      },
+      {
+        "table": "retraction_notice",
+        "index": "retraction_notice_source_record_uq",
+        "columns": "source_record_id"
+      },
+      {
+        "table": "retraction_reason",
+        "index": "PRIMARY",
+        "columns": "retraction_reason_id"
+      },
+      {
+        "table": "retraction_reason",
+        "index": "retraction_reason_source_label_uq",
+        "columns": "source_label"
+      },
+      {
+        "table": "retraction_reason_occurrence",
+        "index": "PRIMARY",
+        "columns": "retraction_notice_id, reason_ordinal"
+      },
+      {
+        "table": "retraction_reason_occurrence",
+        "index": "retraction_reason_occurrence_reason_ix",
+        "columns": "retraction_reason_id"
+      },
+      {
+        "table": "source_misconduct_flag",
+        "index": "PRIMARY",
+        "columns": "source_misconduct_flag_id"
+      },
+      {
+        "table": "source_misconduct_flag",
+        "index": "source_misconduct_flag_notice_uq",
+        "columns": "retraction_notice_id"
+      },
+      {
+        "table": "source_record",
+        "index": "PRIMARY",
+        "columns": "source_record_id"
+      },
+      {
+        "table": "source_record",
+        "index": "source_record_batch_row_uq",
+        "columns": "staging_import_batch_id, staging_source_row_number"
+      },
+      {
+        "table": "source_record",
+        "index": "source_record_etl_batch_fk",
+        "columns": "etl_batch_id"
+      },
+      {
+        "table": "source_record",
+        "index": "source_record_source_key_ix",
+        "columns": "source_record_key"
+      },
+      {
+        "table": "subject_area",
+        "index": "PRIMARY",
+        "columns": "subject_area_id"
+      },
+      {
+        "table": "subject_area",
+        "index": "subject_area_source_label_uq",
+        "columns": "source_label"
+      }
+    ],
+    "partitioned_tables": {},
+    "tables": [
+      "article_type",
+      "country_label",
+      "etl_batch",
+      "etl_record_issue",
+      "publication",
+      "publication_article_type_occurrence",
+      "publication_author_occurrence",
+      "publication_country_occurrence",
+      "publication_subject_occurrence",
+      "retraction_notice",
+      "retraction_reason",
+      "retraction_reason_occurrence",
+      "source_misconduct_flag",
+      "source_record",
+      "subject_area"
+    ]
+  },
+  "queries": [
+    {
+      "number": 1,
+      "title": "Retraction-record volume by recorded notice year.",
+      "row_count": 27,
+      "result_sha256": "dabd163900f19b983c7ff772d21a81c164787d6a0716a605d0e4579dde176c01",
+      "timing": {
+        "median_ms": 41.309,
+        "mean_ms": 41.555,
+        "min_ms": 40.964,
+        "max_ms": 46.683,
+        "stdev_ms": 0.998
+      },
+      "round_medians_ms": [
+        41.381,
+        41.294,
+        41.292
+      ],
+      "round_plans": [
+        "d0d497f60646",
+        "b7ba2cbdad91",
+        "b7ba2cbdad91"
+      ],
+      "plan_files": {
+        "d0d497f60646": "q01.txt",
+        "b7ba2cbdad91": "q01_plan2.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 131819,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 65938,
+        "Created_tmp_tables": 1,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 0,
+        "Sort_rows": 27
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65938,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 27
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65938,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 27
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65938,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 27
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Journals with the most source records; exact source labels are not canonicalized.",
+      "row_count": 20,
+      "result_sha256": "151a5dbcb24b9e0bb0b53cfbc2007803cc159a8d4817ce31bfe11980e8d4c784",
+      "timing": {
+        "median_ms": 233.023,
+        "mean_ms": 235.039,
+        "min_ms": 227.775,
+        "max_ms": 283.764,
+        "stdev_ms": 9.943
+      },
+      "round_medians_ms": [
+        233.023,
+        233.411,
+        231.704
+      ],
+      "round_plans": [
+        "ea436ac4f86d",
+        "ea436ac4f86d",
+        "ea436ac4f86d"
+      ],
+      "plan_files": {
+        "ea436ac4f86d": "q02.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 131819,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 65910,
+        "Created_tmp_tables": 2,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 52,
+        "Sort_rows": 65929
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 52,
+          "Sort_rows": 65929
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 52,
+          "Sort_rows": 65929
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 52,
+          "Sort_rows": 65929
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Retraction records by year and first-listed subject.",
+      "row_count": 2259,
+      "result_sha256": "a40a69460d780976c84b2689ef371ba9b47254659c2713580d55b7b49c8b3918",
+      "timing": {
+        "median_ms": 318.171,
+        "mean_ms": 319.625,
+        "min_ms": 267.361,
+        "max_ms": 381.803,
+        "stdev_ms": 15.472
+      },
+      "round_medians_ms": [
+        318.186,
+        318.072,
+        318.162
+      ],
+      "round_plans": [
+        "cba92dbd9410",
+        "cba92dbd9410",
+        "cba92dbd9410"
+      ],
+      "plan_files": {
+        "cba92dbd9410": "q03.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 253886,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 179553,
+        "Created_tmp_tables": 2,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 47,
+        "Sort_rows": 68168
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 253886,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 179553,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 47,
+          "Sort_rows": 68168
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 253886,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 179553,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 47,
+          "Sort_rows": 68168
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 253886,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 179553,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 47,
+          "Sort_rows": 68168
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Retraction records by first-listed author/institution country label.",
+      "row_count": 162,
+      "result_sha256": "275ddebdaf612c613a7edf2f6b301b16627e1c1bf5f529cd50bd841514eab62b",
+      "timing": {
+        "median_ms": 282.678,
+        "mean_ms": 278.371,
+        "min_ms": 231.643,
+        "max_ms": 303.786,
+        "stdev_ms": 18.702
+      },
+      "round_medians_ms": [
+        285.742,
+        281.373,
+        282.731
+      ],
+      "round_plans": [
+        "e971de6d093d",
+        "e971de6d093d",
+        "e971de6d093d"
+      ],
+      "plan_files": {
+        "e971de6d093d": "q04.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 228413,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 81730,
+        "Created_tmp_tables": 2,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 43,
+        "Sort_rows": 65264
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 228413,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 81730,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 43,
+          "Sort_rows": 65264
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 228413,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 81730,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 43,
+          "Sort_rows": 65264
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 228413,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 81730,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 43,
+          "Sort_rows": 65264
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Retraction-reason occurrence coverage by exact source label.",
+      "row_count": 109,
+      "result_sha256": "bb2a029c5ddd72dcd402f7e7ec0432eac11998d1061698ba65de88d341d21c9e",
+      "timing": {
+        "median_ms": 841.402,
+        "mean_ms": 845.292,
+        "min_ms": 798.217,
+        "max_ms": 888.252,
+        "stdev_ms": 22.527
+      },
+      "round_medians_ms": [
+        842.584,
+        831.804,
+        841.487
+      ],
+      "round_plans": [
+        "b320bbcc1d66",
+        "b320bbcc1d66",
+        "b320bbcc1d66"
+      ],
+      "plan_files": {
+        "b320bbcc1d66": "q05.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 388251,
+        "Handler_read_next": 327760,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 0,
+        "Created_tmp_tables": 2,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 180,
+        "Sort_rows": 261960
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 388251,
+          "Handler_read_next": 327760,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 180,
+          "Sort_rows": 261960
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 388251,
+          "Handler_read_next": 327760,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 180,
+          "Sort_rows": 261960
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 388251,
+          "Handler_read_next": 327760,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 180,
+          "Sort_rows": 261960
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Number of records assigned each article-type label.",
+      "row_count": 26,
+      "result_sha256": "0c60e506b8ef17b9b4db889c88ce154e4d946eb5445d53824505732b5ae01b16",
+      "timing": {
+        "median_ms": 83.74,
+        "mean_ms": 84.183,
+        "min_ms": 83.135,
+        "max_ms": 88.617,
+        "stdev_ms": 1.123
+      },
+      "round_medians_ms": [
+        84.571,
+        83.818,
+        83.474
+      ],
+      "round_plans": [
+        "7cf107b24234",
+        "7cf107b24234",
+        "7cf107b24234"
+      ],
+      "plan_files": {
+        "7cf107b24234": "q06.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 135503,
+        "Handler_read_next": 67764,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 0,
+        "Created_tmp_tables": 1,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 0,
+        "Sort_rows": 26
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 135503,
+          "Handler_read_next": 67764,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 135503,
+          "Handler_read_next": 67764,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 135503,
+          "Handler_read_next": 67764,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Publisher coverage by original publication year.",
+      "row_count": 4449,
+      "result_sha256": "5ac442fe1e64c0ea1023520691fe6ba41be4dd53e93c9e49266e01b877f0871c",
+      "timing": {
+        "median_ms": 245.845,
+        "mean_ms": 245.386,
+        "min_ms": 216.023,
+        "max_ms": 264.375,
+        "stdev_ms": 9.218
+      },
+      "round_medians_ms": [
+        245.665,
+        244.266,
+        247.069
+      ],
+      "round_plans": [
+        "5e6cf6c3eef6",
+        "5e6cf6c3eef6",
+        "5e6cf6c3eef6"
+      ],
+      "plan_files": {
+        "5e6cf6c3eef6": "q07.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 131819,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 65910,
+        "Created_tmp_tables": 1,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 50,
+        "Sort_rows": 70358
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 50,
+          "Sort_rows": 70358
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 50,
+          "Sort_rows": 70358
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 50,
+          "Sort_rows": 70358
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Average difference between recorded dates by publication year.",
+      "row_count": 26,
+      "result_sha256": "5cc7dca9f97276dd52b39cd057d33cdb65b65498c9c811cc4feb14ab68660bce",
+      "timing": {
+        "median_ms": 126.039,
+        "mean_ms": 128.194,
+        "min_ms": 124.399,
+        "max_ms": 155.061,
+        "stdev_ms": 5.881
+      },
+      "round_medians_ms": [
+        126.342,
+        127.333,
+        125.535
+      ],
+      "round_plans": [
+        "ea436ac4f86d",
+        "ea436ac4f86d",
+        "ea436ac4f86d"
+      ],
+      "plan_files": {
+        "ea436ac4f86d": "q08.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 197728,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 65937,
+        "Created_tmp_tables": 1,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 0,
+        "Sort_rows": 26
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 197728,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65937,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 197728,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65937,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 197728,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65937,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "Five most common journal labels per recorded retraction year.",
+      "row_count": 135,
+      "result_sha256": "09172b8ba1876e45c51ae43923e44de7bfb5f713d9b302d606af1e679cde2da0",
+      "timing": {
+        "median_ms": 259.205,
+        "mean_ms": 265.151,
+        "min_ms": 256.182,
+        "max_ms": 305.223,
+        "stdev_ms": 10.597
+      },
+      "round_medians_ms": [
+        270.692,
+        262.306,
+        258.271
+      ],
+      "round_plans": [
+        "aae3bc9f8b6a",
+        "aae3bc9f8b6a",
+        "aae3bc9f8b6a"
+      ],
+      "plan_files": {
+        "aae3bc9f8b6a": "q09.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 131819,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 99248,
+        "Created_tmp_tables": 4,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 3,
+        "Sort_merge_passes": 58,
+        "Sort_rows": 82712
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 99248,
+          "Created_tmp_tables": 4,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 3,
+          "Sort_merge_passes": 58,
+          "Sort_rows": 82712
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 99248,
+          "Created_tmp_tables": 4,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 3,
+          "Sort_merge_passes": 58,
+          "Sort_rows": 82712
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 99248,
+          "Created_tmp_tables": 4,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 3,
+          "Sort_merge_passes": 58,
+          "Sort_rows": 82712
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "Recorded date intervals by primary subject for 2015-2025;",
+      "row_count": 129,
+      "result_sha256": "bac258798d4d40db2e668bbcfdb375016f4bebb2d4874d91cb4f3d7fb9999730",
+      "timing": {
+        "median_ms": 259.449,
+        "mean_ms": 259.866,
+        "min_ms": 257.698,
+        "max_ms": 265.694,
+        "stdev_ms": 1.861
+      },
+      "round_medians_ms": [
+        259.453,
+        260.196,
+        259.062
+      ],
+      "round_plans": [
+        "35333a190b93",
+        "35333a190b93",
+        "35333a190b93"
+      ],
+      "plan_files": {
+        "35333a190b93": "q10.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 186316,
+        "Handler_read_next": 136427,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 65910,
+        "Created_tmp_tables": 2,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 33,
+        "Sort_rows": 48329
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 186316,
+          "Handler_read_next": 136427,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 33,
+          "Sort_rows": 48329
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 186316,
+          "Handler_read_next": 136427,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 33,
+          "Sort_rows": 48329
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 186316,
+          "Handler_read_next": 136427,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 33,
+          "Sort_rows": 48329
+        }
+      ]
+    }
+  ]
+}

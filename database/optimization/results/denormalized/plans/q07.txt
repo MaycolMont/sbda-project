@@ -1,0 +1,27 @@
+-- q07. Publisher coverage by original publication year. (captured in round 1)
+
+SELECT
+    publication_year,
+    publisher_name,
+    COUNT(*) AS retraction_record_count
+FROM retraction_summary
+WHERE original_paper_date IS NOT NULL
+  AND publisher_name IS NOT NULL
+  AND retraction_date IS NOT NULL
+GROUP BY publication_year, publisher_name
+ORDER BY publication_year, retraction_record_count DESC, publisher_name;
+
+== EXPLAIN
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+| id | select_type | table              | partitions | type | possible_keys | key  | key_len | ref  | rows  | filtered | Extra                                        |
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | retraction_summary | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 65478 | 72.9     | Using where; Using temporary; Using filesort |
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: retraction_summary.publication_year, retraction_record_count DESC, retraction_summary.publisher_name  (actual time=50.1..50.3 rows=4449 loops=1)
+    -> Table scan on <temporary>  (actual time=46.2..46.6 rows=4449 loops=1)
+        -> Aggregate using temporary table  (actual time=46.2..46.2 rows=4449 loops=1)
+            -> Filter: ((retraction_summary.original_paper_date is not null) and (retraction_summary.publisher_name is not null) and (retraction_summary.retraction_date is not null))  (cost=6732 rows=47733) (actual time=0.0216..17.1 rows=65909 loops=1)
+                -> Table scan on retraction_summary  (cost=6732 rows=65478) (actual time=0.0208..13.5 rows=65909 loops=1)
+

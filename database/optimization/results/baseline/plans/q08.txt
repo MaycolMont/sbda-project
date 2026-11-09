@@ -1,0 +1,45 @@
+-- q08. Average difference between recorded dates by publication year. (captured in round 1)
+
+WITH recorded_intervals AS (
+    SELECT
+        sr.source_record_id,
+        YEAR(p.original_paper_date) AS publication_year,
+        DATEDIFF(n.retraction_date, p.original_paper_date) AS recorded_day_difference
+    FROM analyst_source_record AS sr
+    JOIN analyst_publication AS p
+        ON p.source_record_id = sr.source_record_id
+    JOIN analyst_retraction_notice AS n
+        ON n.source_record_id = sr.source_record_id
+    WHERE p.original_paper_date IS NOT NULL
+      AND n.retraction_date IS NOT NULL
+      AND n.retraction_date >= p.original_paper_date
+)
+SELECT
+    publication_year,
+    COUNT(*) AS retraction_record_count,
+    AVG(recorded_day_difference) AS average_recorded_day_difference
+FROM recorded_intervals
+GROUP BY publication_year
+ORDER BY publication_year;
+
+== EXPLAIN
++----+-------------+-------------------+------------+--------+------------------------------------+------------------------------+---------+---------------------------------------------------------+-------+----------+----------------------------------------------+
+| id | select_type | table             | partitions | type   | possible_keys                      | key                          | key_len | ref                                                     | rows  | filtered | Extra                                        |
++----+-------------+-------------------+------------+--------+------------------------------------+------------------------------+---------+---------------------------------------------------------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | retraction_notice | NULL       | ALL    | retraction_notice_source_record_uq | NULL                         | NULL    | NULL                                                    | 66069 | 90.0     | Using where; Using temporary; Using filesort |
+| 1  | SIMPLE      | publication       | NULL       | eq_ref | publication_source_record_uq       | publication_source_record_uq | 8       | academic_retractions.retraction_notice.source_record_id | 1     | 30.0     | Using where                                  |
+| 1  | SIMPLE      | source_record     | NULL       | eq_ref | PRIMARY                            | PRIMARY                      | 8       | academic_retractions.retraction_notice.source_record_id | 1     | 100.0    | Using index                                  |
++----+-------------+-------------------+------------+--------+------------------------------------+------------------------------+---------+---------------------------------------------------------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: recorded_intervals.publication_year  (actual time=158..158 rows=26 loops=1)
+    -> Table scan on <temporary>  (actual time=158..158 rows=26 loops=1)
+        -> Aggregate using temporary table  (actual time=158..158 rows=26 loops=1)
+            -> Nested loop inner join  (cost=33734 rows=17837) (actual time=0.0328..139 rows=65909 loops=1)
+                -> Nested loop inner join  (cost=27491 rows=17837) (actual time=0.0306..104 rows=65909 loops=1)
+                    -> Filter: (retraction_notice.retraction_date is not null)  (cost=6679 rows=59462) (actual time=0.0184..13.7 rows=65909 loops=1)
+                        -> Table scan on retraction_notice  (cost=6679 rows=66069) (actual time=0.0178..10.3 rows=65909 loops=1)
+                    -> Filter: ((publication.original_paper_date is not null) and (retraction_notice.retraction_date >= publication.original_paper_date))  (cost=0.25 rows=0.3) (actual time=0.00123..0.00127 rows=1 loops=65909)
+                        -> Single-row index lookup on publication using publication_source_record_uq (source_record_id=retraction_notice.source_record_id)  (cost=0.25 rows=1) (actual time=0.00111..0.00112 rows=1 loops=65909)
+                -> Single-row covering index lookup on source_record using PRIMARY (source_record_id=retraction_notice.source_record_id)  (cost=0.25 rows=1) (actual time=423e-6..439e-6 rows=1 loops=65909)
+

@@ -1,0 +1,29 @@
+-- q01. Retraction-record volume by recorded notice year. (captured in round 2)
+
+SELECT
+    YEAR(n.retraction_date) AS retraction_year,
+    COUNT(*) AS retraction_record_count
+FROM analyst_retraction_notice AS n
+JOIN analyst_source_record AS sr
+    ON sr.source_record_id = n.source_record_id
+WHERE n.retraction_date IS NOT NULL
+GROUP BY YEAR(n.retraction_date)
+ORDER BY retraction_year;
+
+== EXPLAIN
++----+-------------+-------------------+------------+--------+------------------------------------+---------+---------+---------------------------------------------------------+-------+----------+----------------------------------------------+
+| id | select_type | table             | partitions | type   | possible_keys                      | key     | key_len | ref                                                     | rows  | filtered | Extra                                        |
++----+-------------+-------------------+------------+--------+------------------------------------+---------+---------+---------------------------------------------------------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | retraction_notice | NULL       | ALL    | retraction_notice_source_record_uq | NULL    | NULL    | NULL                                                    | 65556 | 90.0     | Using where; Using temporary; Using filesort |
+| 1  | SIMPLE      | source_record     | NULL       | eq_ref | PRIMARY                            | PRIMARY | 8       | academic_retractions.retraction_notice.source_record_id | 1     | 100.0    | Using index                                  |
++----+-------------+-------------------+------------+--------+------------------------------------+---------+---------+---------------------------------------------------------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: `year(retraction_notice.retraction_date)`  (actual time=54..54 rows=27 loops=1)
+    -> Table scan on <temporary>  (actual time=54..54 rows=27 loops=1)
+        -> Aggregate using temporary table  (actual time=54..54 rows=27 loops=1)
+            -> Nested loop inner join  (cost=27278 rows=59000) (actual time=0.0178..45.1 rows=65909 loops=1)
+                -> Filter: (retraction_notice.retraction_date is not null)  (cost=6628 rows=59000) (actual time=0.0132..12.8 rows=65909 loops=1)
+                    -> Table scan on retraction_notice  (cost=6628 rows=65556) (actual time=0.0128..9.99 rows=65909 loops=1)
+                -> Single-row covering index lookup on source_record using PRIMARY (source_record_id=retraction_notice.source_record_id)  (cost=0.25 rows=1) (actual time=388e-6..404e-6 rows=1 loops=65909)
+

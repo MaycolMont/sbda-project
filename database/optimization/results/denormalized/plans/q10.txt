@@ -1,0 +1,30 @@
+-- q10. Recorded date intervals by primary subject for 2015-2025. (captured in round 1)
+
+SELECT
+    primary_subject_label AS primary_subject,
+    COUNT(*) AS retraction_record_count,
+    AVG(DATEDIFF(retraction_date, original_paper_date))
+        AS average_recorded_day_difference
+FROM retraction_summary
+WHERE retraction_date >= '2015-01-01'
+  AND retraction_date < '2026-01-01'
+  AND original_paper_date IS NOT NULL
+  AND retraction_date >= original_paper_date
+  AND primary_subject_label IS NOT NULL
+GROUP BY primary_subject_label
+ORDER BY retraction_record_count DESC, primary_subject;
+
+== EXPLAIN
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+| id | select_type | table              | partitions | type | possible_keys | key  | key_len | ref  | rows  | filtered | Extra                                        |
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | retraction_summary | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 65478 | 3.0      | Using where; Using temporary; Using filesort |
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: retraction_record_count DESC, retraction_summary.primary_subject_label  (actual time=39.1..39.1 rows=129 loops=1)
+    -> Table scan on <temporary>  (actual time=39..39 rows=129 loops=1)
+        -> Aggregate using temporary table  (actual time=39..39 rows=129 loops=1)
+            -> Filter: ((retraction_summary.retraction_date >= DATE'2015-01-01') and (retraction_summary.retraction_date < DATE'2026-01-01') and (retraction_summary.original_paper_date is not null) and (retraction_summary.retraction_date >= retraction_summary.original_paper_date) and (retraction_summary.primary_subject_label is not null))  (cost=6732 rows=1964) (actual time=0.0262..19.1 rows=48200 loops=1)
+                -> Table scan on retraction_summary  (cost=6732 rows=65478) (actual time=0.0218..12.7 rows=65909 loops=1)
+

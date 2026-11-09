@@ -1,0 +1,25 @@
+-- q04. Retraction records by first-listed author/institution country label. (captured in round 1)
+
+SELECT
+    primary_country_label,
+    COUNT(*) AS retraction_record_count
+FROM retraction_summary
+WHERE retraction_date IS NOT NULL
+  AND primary_country_label IS NOT NULL
+GROUP BY primary_country_label
+ORDER BY retraction_record_count DESC, primary_country_label;
+
+== EXPLAIN
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+| id | select_type | table              | partitions | type | possible_keys | key  | key_len | ref  | rows  | filtered | Extra                                        |
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | retraction_summary | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 65478 | 81.0     | Using where; Using temporary; Using filesort |
++----+-------------+--------------------+------------+------+---------------+------+---------+------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: retraction_record_count DESC, retraction_summary.primary_country_label  (actual time=29.4..29.4 rows=162 loops=1)
+    -> Table scan on <temporary>  (actual time=29.3..29.4 rows=162 loops=1)
+        -> Aggregate using temporary table  (actual time=29.3..29.3 rows=162 loops=1)
+            -> Filter: ((retraction_summary.retraction_date is not null) and (retraction_summary.primary_country_label is not null))  (cost=6732 rows=53037) (actual time=0.0159..14.8 rows=65102 loops=1)
+                -> Table scan on retraction_summary  (cost=6732 rows=65478) (actual time=0.0152..11.5 rows=65909 loops=1)
+

@@ -1,0 +1,29 @@
+-- q01. Retraction-record volume by recorded notice year. (captured in round 1)
+
+SELECT
+    YEAR(n.retraction_date) AS retraction_year,
+    COUNT(*) AS retraction_record_count
+FROM analyst_retraction_notice AS n
+JOIN analyst_source_record AS sr
+    ON sr.source_record_id = n.source_record_id
+WHERE n.retraction_date IS NOT NULL
+GROUP BY YEAR(n.retraction_date)
+ORDER BY retraction_year;
+
+== EXPLAIN
++----+-------------+-------------------+------------+--------+------------------------------------+------------------------------------+---------+-----------------------------------------------------+-------+----------+----------------------------------------------+
+| id | select_type | table             | partitions | type   | possible_keys                      | key                                | key_len | ref                                                 | rows  | filtered | Extra                                        |
++----+-------------+-------------------+------------+--------+------------------------------------+------------------------------------+---------+-----------------------------------------------------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | source_record     | NULL       | index  | PRIMARY                            | source_record_etl_batch_fk         | 8       | NULL                                                | 65662 | 100.0    | Using index; Using temporary; Using filesort |
+| 1  | SIMPLE      | retraction_notice | NULL       | eq_ref | retraction_notice_source_record_uq | retraction_notice_source_record_uq | 8       | academic_retractions.source_record.source_record_id | 1     | 90.0     | Using where                                  |
++----+-------------+-------------------+------------+--------+------------------------------------+------------------------------------+---------+-----------------------------------------------------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: `year(retraction_notice.retraction_date)`  (actual time=99.5..99.5 rows=27 loops=1)
+    -> Table scan on <temporary>  (actual time=99.5..99.5 rows=27 loops=1)
+        -> Aggregate using temporary table  (actual time=99.5..99.5 rows=27 loops=1)
+            -> Nested loop inner join  (cost=29947 rows=59096) (actual time=0.286..90.5 rows=65909 loops=1)
+                -> Covering index scan on source_record using source_record_etl_batch_fk  (cost=6966 rows=65662) (actual time=0.275..6.59 rows=65909 loops=1)
+                -> Filter: (retraction_notice.retraction_date is not null)  (cost=0.25 rows=0.9) (actual time=0.00114..0.00118 rows=1 loops=65909)
+                    -> Single-row index lookup on retraction_notice using retraction_notice_source_record_uq (source_record_id=source_record.source_record_id)  (cost=0.25 rows=1) (actual time=0.00105..0.00107 rows=1 loops=65909)
+

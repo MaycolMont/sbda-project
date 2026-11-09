@@ -1,0 +1,1038 @@
+{
+  "label": "baseline",
+  "measured_at_utc": "2026-11-09T18:10:41+00:00",
+  "method": {
+    "cache": "warm (warm-up executions discarded; buffer pool holds the data set)",
+    "rounds": 3,
+    "warmup_executions": 2,
+    "timed_executions": 10,
+    "statistics_refreshed_each_round": true,
+    "session_settings": {},
+    "timing_scope": "client wall clock: execute + fetch all rows"
+  },
+  "environment": {
+    "mysql": {
+      "innodb_buffer_pool_size": "134217728",
+      "internal_tmp_mem_storage_engine": "TempTable",
+      "join_buffer_size": "262144",
+      "max_heap_table_size": "16777216",
+      "optimizer_switch": "index_merge=on,index_merge_union=on,index_merge_sort_union=on,index_merge_intersection=on,engine_condition_pushdown=on,index_condition_pushdown=on,mrr=on,mrr_cost_based=on,block_nested_loop=on,batched_key_access=off,materialization=on,semijoin=on,loosescan=on,firstmatch=on,duplicateweedout=on,subquery_materialization_cost_based=on,use_index_extensions=on,condition_fanout_filter=on,derived_merge=on,use_invisible_indexes=off,skip_scan=on,hash_join=on,subquery_to_derived=off,prefer_ordering_index=on,hypergraph_optimizer=off,derived_condition_pushdown=on",
+      "sort_buffer_size": "262144",
+      "tmp_table_size": "16777216",
+      "version": "8.0.46"
+    },
+    "client_platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+    "client_python": "3.12.3",
+    "cpu_count": 20,
+    "git": {
+      "commit": "594b40fd99e8d46c683e0bed16c65bc1c8129a72",
+      "dirty": true
+    }
+  },
+  "inventory": {
+    "row_counts": {
+      "article_type": 26,
+      "country_label": 183,
+      "etl_batch": 1,
+      "etl_record_issue": 1026,
+      "publication": 65909,
+      "publication_article_type_occurrence": 67738,
+      "publication_author_occurrence": 271390,
+      "publication_country_occurrence": 81729,
+      "publication_subject_occurrence": 179552,
+      "retraction_notice": 65909,
+      "retraction_reason": 109,
+      "retraction_reason_occurrence": 261851,
+      "source_misconduct_flag": 65909,
+      "source_record": 65909,
+      "subject_area": 130
+    },
+    "indexes": [
+      {
+        "table": "article_type",
+        "index": "article_type_source_label_uq",
+        "columns": "source_label"
+      },
+      {
+        "table": "article_type",
+        "index": "PRIMARY",
+        "columns": "article_type_id"
+      },
+      {
+        "table": "country_label",
+        "index": "country_label_source_label_uq",
+        "columns": "source_label"
+      },
+      {
+        "table": "country_label",
+        "index": "PRIMARY",
+        "columns": "country_label_id"
+      },
+      {
+        "table": "etl_batch",
+        "index": "etl_batch_import_attempt_uq",
+        "columns": "staging_import_batch_id, attempt_number"
+      },
+      {
+        "table": "etl_batch",
+        "index": "PRIMARY",
+        "columns": "etl_batch_id"
+      },
+      {
+        "table": "etl_record_issue",
+        "index": "etl_record_issue_batch_row_ix",
+        "columns": "etl_batch_id, source_row_number"
+      },
+      {
+        "table": "etl_record_issue",
+        "index": "etl_record_issue_batch_severity_ix",
+        "columns": "etl_batch_id, issue_severity"
+      },
+      {
+        "table": "etl_record_issue",
+        "index": "PRIMARY",
+        "columns": "etl_record_issue_id"
+      },
+      {
+        "table": "publication",
+        "index": "PRIMARY",
+        "columns": "publication_id"
+      },
+      {
+        "table": "publication",
+        "index": "publication_source_record_uq",
+        "columns": "source_record_id"
+      },
+      {
+        "table": "publication_article_type_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, article_type_ordinal"
+      },
+      {
+        "table": "publication_article_type_occurrence",
+        "index": "publication_article_type_occurrence_article_type_ix",
+        "columns": "article_type_id"
+      },
+      {
+        "table": "publication_author_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, author_ordinal"
+      },
+      {
+        "table": "publication_country_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, country_ordinal"
+      },
+      {
+        "table": "publication_country_occurrence",
+        "index": "publication_country_occurrence_country_label_ix",
+        "columns": "country_label_id"
+      },
+      {
+        "table": "publication_subject_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, subject_ordinal"
+      },
+      {
+        "table": "publication_subject_occurrence",
+        "index": "publication_subject_occurrence_subject_area_ix",
+        "columns": "subject_area_id"
+      },
+      {
+        "table": "retraction_notice",
+        "index": "PRIMARY",
+        "columns": "retraction_notice_id"
+      },
+      {
+        "table": "retraction_notice",
+        "index": "retraction_notice_source_record_uq",
+        "columns": "source_record_id"
+      },
+      {
+        "table": "retraction_reason",
+        "index": "PRIMARY",
+        "columns": "retraction_reason_id"
+      },
+      {
+        "table": "retraction_reason",
+        "index": "retraction_reason_source_label_uq",
+        "columns": "source_label"
+      },
+      {
+        "table": "retraction_reason_occurrence",
+        "index": "PRIMARY",
+        "columns": "retraction_notice_id, reason_ordinal"
+      },
+      {
+        "table": "retraction_reason_occurrence",
+        "index": "retraction_reason_occurrence_reason_ix",
+        "columns": "retraction_reason_id"
+      },
+      {
+        "table": "source_misconduct_flag",
+        "index": "PRIMARY",
+        "columns": "source_misconduct_flag_id"
+      },
+      {
+        "table": "source_misconduct_flag",
+        "index": "source_misconduct_flag_notice_uq",
+        "columns": "retraction_notice_id"
+      },
+      {
+        "table": "source_record",
+        "index": "PRIMARY",
+        "columns": "source_record_id"
+      },
+      {
+        "table": "source_record",
+        "index": "source_record_batch_row_uq",
+        "columns": "staging_import_batch_id, staging_source_row_number"
+      },
+      {
+        "table": "source_record",
+        "index": "source_record_etl_batch_fk",
+        "columns": "etl_batch_id"
+      },
+      {
+        "table": "source_record",
+        "index": "source_record_source_key_ix",
+        "columns": "source_record_key"
+      },
+      {
+        "table": "subject_area",
+        "index": "PRIMARY",
+        "columns": "subject_area_id"
+      },
+      {
+        "table": "subject_area",
+        "index": "subject_area_source_label_uq",
+        "columns": "source_label"
+      }
+    ],
+    "partitioned_tables": {},
+    "tables": [
+      "article_type",
+      "country_label",
+      "etl_batch",
+      "etl_record_issue",
+      "publication",
+      "publication_article_type_occurrence",
+      "publication_author_occurrence",
+      "publication_country_occurrence",
+      "publication_subject_occurrence",
+      "retraction_notice",
+      "retraction_reason",
+      "retraction_reason_occurrence",
+      "source_misconduct_flag",
+      "source_record",
+      "subject_area"
+    ]
+  },
+  "queries": [
+    {
+      "number": 1,
+      "title": "Retraction-record volume by recorded notice year.",
+      "row_count": 27,
+      "result_sha256": "dabd163900f19b983c7ff772d21a81c164787d6a0716a605d0e4579dde176c01",
+      "timing": {
+        "median_ms": 41.405,
+        "mean_ms": 54.826,
+        "min_ms": 40.864,
+        "max_ms": 89.415,
+        "stdev_ms": 19.254
+      },
+      "round_medians_ms": [
+        80.546,
+        41.347,
+        41.182
+      ],
+      "round_plans": [
+        "d0d497f60646",
+        "b7ba2cbdad91",
+        "d0d497f60646"
+      ],
+      "plan_files": {
+        "d0d497f60646": "q01.txt",
+        "b7ba2cbdad91": "q01_plan2.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 131819,
+        "Handler_read_next": 65909,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 28,
+        "Created_tmp_tables": 1,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 0,
+        "Sort_rows": 27
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 65909,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 28,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 27
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65938,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 27
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65938,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 27
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Journals with the most source records; exact source labels are not canonicalized.",
+      "row_count": 20,
+      "result_sha256": "151a5dbcb24b9e0bb0b53cfbc2007803cc159a8d4817ce31bfe11980e8d4c784",
+      "timing": {
+        "median_ms": 248.018,
+        "mean_ms": 259.022,
+        "min_ms": 234.233,
+        "max_ms": 295.223,
+        "stdev_ms": 17.478
+      },
+      "round_medians_ms": [
+        275.669,
+        247.28,
+        247.487
+      ],
+      "round_plans": [
+        "84ec6808433e",
+        "5e6cf6c3eef6",
+        "5e6cf6c3eef6"
+      ],
+      "plan_files": {
+        "84ec6808433e": "q02.txt",
+        "5e6cf6c3eef6": "q02_plan2.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 131819,
+        "Handler_read_next": 65909,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 0,
+        "Created_tmp_tables": 2,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 52,
+        "Sort_rows": 65929
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 65909,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 52,
+          "Sort_rows": 65929
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 52,
+          "Sort_rows": 65929
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 52,
+          "Sort_rows": 65929
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Retraction records by year and first-listed subject.",
+      "row_count": 2259,
+      "result_sha256": "a40a69460d780976c84b2689ef371ba9b47254659c2713580d55b7b49c8b3918",
+      "timing": {
+        "median_ms": 320.537,
+        "mean_ms": 322.629,
+        "min_ms": 314.838,
+        "max_ms": 334.864,
+        "stdev_ms": 6.091
+      },
+      "round_medians_ms": [
+        321.52,
+        318.715,
+        319.9
+      ],
+      "round_plans": [
+        "cba92dbd9410",
+        "cba92dbd9410",
+        "cba92dbd9410"
+      ],
+      "plan_files": {
+        "cba92dbd9410": "q03.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 253886,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 179553,
+        "Created_tmp_tables": 2,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 47,
+        "Sort_rows": 68168
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 253886,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 179553,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 47,
+          "Sort_rows": 68168
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 253886,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 179553,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 47,
+          "Sort_rows": 68168
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 253886,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 179553,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 47,
+          "Sort_rows": 68168
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Retraction records by first-listed author/institution country label.",
+      "row_count": 162,
+      "result_sha256": "275ddebdaf612c613a7edf2f6b301b16627e1c1bf5f529cd50bd841514eab62b",
+      "timing": {
+        "median_ms": 279.007,
+        "mean_ms": 278.931,
+        "min_ms": 229.006,
+        "max_ms": 352.215,
+        "stdev_ms": 32.04
+      },
+      "round_medians_ms": [
+        276.203,
+        279.006,
+        285.532
+      ],
+      "round_plans": [
+        "e971de6d093d",
+        "e971de6d093d",
+        "e971de6d093d"
+      ],
+      "plan_files": {
+        "e971de6d093d": "q04.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 228413,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 81730,
+        "Created_tmp_tables": 2,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 43,
+        "Sort_rows": 65264
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 228413,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 81730,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 43,
+          "Sort_rows": 65264
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 228413,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 81730,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 43,
+          "Sort_rows": 65264
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 228413,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 81730,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 43,
+          "Sort_rows": 65264
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Retraction-reason occurrence coverage by exact source label.",
+      "row_count": 109,
+      "result_sha256": "bb2a029c5ddd72dcd402f7e7ec0432eac11998d1061698ba65de88d341d21c9e",
+      "timing": {
+        "median_ms": 830.697,
+        "mean_ms": 833.54,
+        "min_ms": 798.173,
+        "max_ms": 882.113,
+        "stdev_ms": 18.709
+      },
+      "round_medians_ms": [
+        833.174,
+        823.648,
+        838.575
+      ],
+      "round_plans": [
+        "b320bbcc1d66",
+        "4c790b3618e1",
+        "b320bbcc1d66"
+      ],
+      "plan_files": {
+        "b320bbcc1d66": "q05.txt",
+        "4c790b3618e1": "q05_plan2.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 388251,
+        "Handler_read_next": 327760,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 0,
+        "Created_tmp_tables": 2,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 180,
+        "Sort_rows": 261960
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 388251,
+          "Handler_read_next": 327760,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 180,
+          "Sort_rows": 261960
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 388251,
+          "Handler_read_next": 327760,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 180,
+          "Sort_rows": 261960
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 388251,
+          "Handler_read_next": 327760,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 180,
+          "Sort_rows": 261960
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Number of records assigned each article-type label.",
+      "row_count": 26,
+      "result_sha256": "0c60e506b8ef17b9b4db889c88ce154e4d946eb5445d53824505732b5ae01b16",
+      "timing": {
+        "median_ms": 84.594,
+        "mean_ms": 84.829,
+        "min_ms": 82.84,
+        "max_ms": 89.633,
+        "stdev_ms": 1.36
+      },
+      "round_medians_ms": [
+        83.846,
+        84.847,
+        85.173
+      ],
+      "round_plans": [
+        "7cf107b24234",
+        "7cf107b24234",
+        "7cf107b24234"
+      ],
+      "plan_files": {
+        "7cf107b24234": "q06.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 135503,
+        "Handler_read_next": 67764,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 0,
+        "Created_tmp_tables": 1,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 0,
+        "Sort_rows": 26
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 135503,
+          "Handler_read_next": 67764,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 135503,
+          "Handler_read_next": 67764,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 135503,
+          "Handler_read_next": 67764,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Publisher coverage by original publication year.",
+      "row_count": 4449,
+      "result_sha256": "5ac442fe1e64c0ea1023520691fe6ba41be4dd53e93c9e49266e01b877f0871c",
+      "timing": {
+        "median_ms": 244.904,
+        "mean_ms": 242.867,
+        "min_ms": 216.16,
+        "max_ms": 263.842,
+        "stdev_ms": 10.513
+      },
+      "round_medians_ms": [
+        246.842,
+        244.789,
+        242.093
+      ],
+      "round_plans": [
+        "5e6cf6c3eef6",
+        "5e6cf6c3eef6",
+        "5e6cf6c3eef6"
+      ],
+      "plan_files": {
+        "5e6cf6c3eef6": "q07.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 131819,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 65910,
+        "Created_tmp_tables": 1,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 50,
+        "Sort_rows": 70358
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 50,
+          "Sort_rows": 70358
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 50,
+          "Sort_rows": 70358
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 50,
+          "Sort_rows": 70358
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Average difference between recorded dates by publication year.",
+      "row_count": 26,
+      "result_sha256": "5cc7dca9f97276dd52b39cd057d33cdb65b65498c9c811cc4feb14ab68660bce",
+      "timing": {
+        "median_ms": 125.86,
+        "mean_ms": 127.012,
+        "min_ms": 124.571,
+        "max_ms": 138.701,
+        "stdev_ms": 3.183
+      },
+      "round_medians_ms": [
+        127.606,
+        125.606,
+        124.897
+      ],
+      "round_plans": [
+        "ea436ac4f86d",
+        "5e6cf6c3eef6",
+        "5e6cf6c3eef6"
+      ],
+      "plan_files": {
+        "ea436ac4f86d": "q08.txt",
+        "5e6cf6c3eef6": "q08_plan2.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 197728,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 65937,
+        "Created_tmp_tables": 1,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 0,
+        "Sort_rows": 26
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 197728,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65937,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 197728,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65937,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 197728,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65937,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 26
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "Five most common journal labels per recorded retraction year.",
+      "row_count": 135,
+      "result_sha256": "09172b8ba1876e45c51ae43923e44de7bfb5f713d9b302d606af1e679cde2da0",
+      "timing": {
+        "median_ms": 278.259,
+        "mean_ms": 270.478,
+        "min_ms": 221.886,
+        "max_ms": 295.305,
+        "stdev_ms": 16.489
+      },
+      "round_medians_ms": [
+        257.145,
+        278.553,
+        279.102
+      ],
+      "round_plans": [
+        "aae3bc9f8b6a",
+        "a7beb2b50444",
+        "a7beb2b50444"
+      ],
+      "plan_files": {
+        "aae3bc9f8b6a": "q09.txt",
+        "a7beb2b50444": "q09_plan2.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 131819,
+        "Handler_read_next": 0,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 99248,
+        "Created_tmp_tables": 4,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 3,
+        "Sort_merge_passes": 58,
+        "Sort_rows": 82712
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 99248,
+          "Created_tmp_tables": 4,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 3,
+          "Sort_merge_passes": 58,
+          "Sort_rows": 82712
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 99248,
+          "Created_tmp_tables": 4,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 3,
+          "Sort_merge_passes": 58,
+          "Sort_rows": 82712
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 131819,
+          "Handler_read_next": 0,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 99248,
+          "Created_tmp_tables": 4,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 3,
+          "Sort_merge_passes": 58,
+          "Sort_rows": 82712
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "Recorded date intervals by primary subject for 2015-2025;",
+      "row_count": 129,
+      "result_sha256": "bac258798d4d40db2e668bbcfdb375016f4bebb2d4874d91cb4f3d7fb9999730",
+      "timing": {
+        "median_ms": 258.394,
+        "mean_ms": 259.994,
+        "min_ms": 256.81,
+        "max_ms": 274.627,
+        "stdev_ms": 3.835
+      },
+      "round_medians_ms": [
+        257.586,
+        258.814,
+        259.669
+      ],
+      "round_plans": [
+        "35333a190b93",
+        "35333a190b93",
+        "35333a190b93"
+      ],
+      "plan_files": {
+        "35333a190b93": "q10.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 186316,
+        "Handler_read_next": 136427,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 65910,
+        "Created_tmp_tables": 2,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 33,
+        "Sort_rows": 48329
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 186316,
+          "Handler_read_next": 136427,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 33,
+          "Sort_rows": 48329
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 186316,
+          "Handler_read_next": 136427,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 33,
+          "Sort_rows": 48329
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 186316,
+          "Handler_read_next": 136427,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 65910,
+          "Created_tmp_tables": 2,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 33,
+          "Sort_rows": 48329
+        }
+      ]
+    }
+  ]
+}

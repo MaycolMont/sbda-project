@@ -1,0 +1,323 @@
+{
+  "label": "tuned_q05",
+  "measured_at_utc": "2026-11-09T18:16:18+00:00",
+  "method": {
+    "cache": "warm (warm-up executions discarded; buffer pool holds the data set)",
+    "rounds": 3,
+    "warmup_executions": 2,
+    "timed_executions": 10,
+    "statistics_refreshed_each_round": true,
+    "session_settings": {},
+    "timing_scope": "client wall clock: execute + fetch all rows"
+  },
+  "environment": {
+    "mysql": {
+      "innodb_buffer_pool_size": "134217728",
+      "internal_tmp_mem_storage_engine": "TempTable",
+      "join_buffer_size": "262144",
+      "max_heap_table_size": "16777216",
+      "optimizer_switch": "index_merge=on,index_merge_union=on,index_merge_sort_union=on,index_merge_intersection=on,engine_condition_pushdown=on,index_condition_pushdown=on,mrr=on,mrr_cost_based=on,block_nested_loop=on,batched_key_access=off,materialization=on,semijoin=on,loosescan=on,firstmatch=on,duplicateweedout=on,subquery_materialization_cost_based=on,use_index_extensions=on,condition_fanout_filter=on,derived_merge=on,use_invisible_indexes=off,skip_scan=on,hash_join=on,subquery_to_derived=off,prefer_ordering_index=on,hypergraph_optimizer=off,derived_condition_pushdown=on",
+      "sort_buffer_size": "4194304",
+      "tmp_table_size": "16777216",
+      "version": "8.0.46"
+    },
+    "client_platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+    "client_python": "3.12.3",
+    "cpu_count": 20,
+    "git": {
+      "commit": "594b40fd99e8d46c683e0bed16c65bc1c8129a72",
+      "dirty": true
+    }
+  },
+  "inventory": {
+    "row_counts": {
+      "article_type": 26,
+      "country_label": 183,
+      "etl_batch": 1,
+      "etl_record_issue": 1026,
+      "publication": 65909,
+      "publication_article_type_occurrence": 67738,
+      "publication_author_occurrence": 271390,
+      "publication_country_occurrence": 81729,
+      "publication_subject_occurrence": 179552,
+      "retraction_notice": 65909,
+      "retraction_reason": 109,
+      "retraction_reason_occurrence": 261851,
+      "source_misconduct_flag": 65909,
+      "source_record": 65909,
+      "subject_area": 130
+    },
+    "indexes": [
+      {
+        "table": "article_type",
+        "index": "article_type_source_label_uq",
+        "columns": "source_label"
+      },
+      {
+        "table": "article_type",
+        "index": "PRIMARY",
+        "columns": "article_type_id"
+      },
+      {
+        "table": "country_label",
+        "index": "country_label_source_label_uq",
+        "columns": "source_label"
+      },
+      {
+        "table": "country_label",
+        "index": "PRIMARY",
+        "columns": "country_label_id"
+      },
+      {
+        "table": "etl_batch",
+        "index": "etl_batch_import_attempt_uq",
+        "columns": "staging_import_batch_id, attempt_number"
+      },
+      {
+        "table": "etl_batch",
+        "index": "PRIMARY",
+        "columns": "etl_batch_id"
+      },
+      {
+        "table": "etl_record_issue",
+        "index": "etl_record_issue_batch_row_ix",
+        "columns": "etl_batch_id, source_row_number"
+      },
+      {
+        "table": "etl_record_issue",
+        "index": "etl_record_issue_batch_severity_ix",
+        "columns": "etl_batch_id, issue_severity"
+      },
+      {
+        "table": "etl_record_issue",
+        "index": "PRIMARY",
+        "columns": "etl_record_issue_id"
+      },
+      {
+        "table": "publication",
+        "index": "PRIMARY",
+        "columns": "publication_id"
+      },
+      {
+        "table": "publication",
+        "index": "publication_source_record_uq",
+        "columns": "source_record_id"
+      },
+      {
+        "table": "publication_article_type_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, article_type_ordinal"
+      },
+      {
+        "table": "publication_article_type_occurrence",
+        "index": "publication_article_type_occurrence_article_type_ix",
+        "columns": "article_type_id"
+      },
+      {
+        "table": "publication_author_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, author_ordinal"
+      },
+      {
+        "table": "publication_country_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, country_ordinal"
+      },
+      {
+        "table": "publication_country_occurrence",
+        "index": "publication_country_occurrence_country_label_ix",
+        "columns": "country_label_id"
+      },
+      {
+        "table": "publication_country_occurrence",
+        "index": "publication_country_occurrence_primary_country_ix",
+        "columns": "is_primary, country_label_id, publication_id"
+      },
+      {
+        "table": "publication_subject_occurrence",
+        "index": "PRIMARY",
+        "columns": "publication_id, subject_ordinal"
+      },
+      {
+        "table": "publication_subject_occurrence",
+        "index": "publication_subject_occurrence_primary_subject_ix",
+        "columns": "is_primary, subject_area_id, publication_id"
+      },
+      {
+        "table": "publication_subject_occurrence",
+        "index": "publication_subject_occurrence_subject_area_ix",
+        "columns": "subject_area_id"
+      },
+      {
+        "table": "retraction_notice",
+        "index": "PRIMARY",
+        "columns": "retraction_notice_id"
+      },
+      {
+        "table": "retraction_notice",
+        "index": "retraction_notice_source_record_uq",
+        "columns": "source_record_id"
+      },
+      {
+        "table": "retraction_reason",
+        "index": "PRIMARY",
+        "columns": "retraction_reason_id"
+      },
+      {
+        "table": "retraction_reason",
+        "index": "retraction_reason_source_label_uq",
+        "columns": "source_label"
+      },
+      {
+        "table": "retraction_reason_occurrence",
+        "index": "PRIMARY",
+        "columns": "retraction_notice_id, reason_ordinal"
+      },
+      {
+        "table": "retraction_reason_occurrence",
+        "index": "retraction_reason_occurrence_reason_ix",
+        "columns": "retraction_reason_id"
+      },
+      {
+        "table": "source_misconduct_flag",
+        "index": "PRIMARY",
+        "columns": "source_misconduct_flag_id"
+      },
+      {
+        "table": "source_misconduct_flag",
+        "index": "source_misconduct_flag_notice_uq",
+        "columns": "retraction_notice_id"
+      },
+      {
+        "table": "source_record",
+        "index": "PRIMARY",
+        "columns": "source_record_id"
+      },
+      {
+        "table": "source_record",
+        "index": "source_record_batch_row_uq",
+        "columns": "staging_import_batch_id, staging_source_row_number"
+      },
+      {
+        "table": "source_record",
+        "index": "source_record_etl_batch_fk",
+        "columns": "etl_batch_id"
+      },
+      {
+        "table": "source_record",
+        "index": "source_record_source_key_ix",
+        "columns": "source_record_key"
+      },
+      {
+        "table": "subject_area",
+        "index": "PRIMARY",
+        "columns": "subject_area_id"
+      },
+      {
+        "table": "subject_area",
+        "index": "subject_area_source_label_uq",
+        "columns": "source_label"
+      }
+    ],
+    "partitioned_tables": {},
+    "tables": [
+      "article_type",
+      "country_label",
+      "etl_batch",
+      "etl_record_issue",
+      "publication",
+      "publication_article_type_occurrence",
+      "publication_author_occurrence",
+      "publication_country_occurrence",
+      "publication_subject_occurrence",
+      "retraction_notice",
+      "retraction_reason",
+      "retraction_reason_occurrence",
+      "source_misconduct_flag",
+      "source_record",
+      "subject_area"
+    ]
+  },
+  "queries": [
+    {
+      "number": 5,
+      "title": "Retraction-reason occurrence coverage (join order fixed).",
+      "row_count": 109,
+      "result_sha256": "bb2a029c5ddd72dcd402f7e7ec0432eac11998d1061698ba65de88d341d21c9e",
+      "timing": {
+        "median_ms": 316.371,
+        "mean_ms": 318.159,
+        "min_ms": 311.682,
+        "max_ms": 334.662,
+        "stdev_ms": 5.623
+      },
+      "round_medians_ms": [
+        317.721,
+        316.902,
+        316.223
+      ],
+      "round_plans": [
+        "fd66f6ee15e1",
+        "fd66f6ee15e1",
+        "fd66f6ee15e1"
+      ],
+      "plan_files": {
+        "fd66f6ee15e1": "q05.txt"
+      },
+      "handler_counters": {
+        "Handler_read_first": 1,
+        "Handler_read_key": 523812,
+        "Handler_read_next": 261960,
+        "Handler_read_rnd": 0,
+        "Handler_read_rnd_next": 0,
+        "Created_tmp_tables": 1,
+        "Created_tmp_disk_tables": 0,
+        "Select_full_join": 0,
+        "Select_scan": 1,
+        "Sort_merge_passes": 0,
+        "Sort_rows": 109
+      },
+      "round_handler_counters": [
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 523812,
+          "Handler_read_next": 261960,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 109
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 523812,
+          "Handler_read_next": 261960,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 109
+        },
+        {
+          "Handler_read_first": 1,
+          "Handler_read_key": 523812,
+          "Handler_read_next": 261960,
+          "Handler_read_rnd": 0,
+          "Handler_read_rnd_next": 0,
+          "Created_tmp_tables": 1,
+          "Created_tmp_disk_tables": 0,
+          "Select_full_join": 0,
+          "Select_scan": 1,
+          "Sort_merge_passes": 0,
+          "Sort_rows": 109
+        }
+      ]
+    }
+  ]
+}

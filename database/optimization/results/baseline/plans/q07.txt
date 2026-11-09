@@ -1,0 +1,39 @@
+-- q07. Publisher coverage by original publication year. (captured in round 1)
+
+SELECT
+    YEAR(p.original_paper_date) AS publication_year,
+    p.publisher_name,
+    COUNT(DISTINCT sr.source_record_id) AS retraction_record_count
+FROM analyst_source_record AS sr
+JOIN analyst_publication AS p
+    ON p.source_record_id = sr.source_record_id
+JOIN analyst_retraction_notice AS n
+    ON n.source_record_id = sr.source_record_id
+WHERE p.original_paper_date IS NOT NULL
+  AND p.publisher_name IS NOT NULL
+  AND n.retraction_date IS NOT NULL
+GROUP BY YEAR(p.original_paper_date), p.publisher_name
+ORDER BY publication_year, retraction_record_count DESC, p.publisher_name;
+
+== EXPLAIN
++----+-------------+-------------------+------------+--------+------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+----------------------------------------------+
+| id | select_type | table             | partitions | type   | possible_keys                      | key                                | key_len | ref                                               | rows  | filtered | Extra                                        |
++----+-------------+-------------------+------------+--------+------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+----------------------------------------------+
+| 1  | SIMPLE      | publication       | NULL       | ALL    | publication_source_record_uq       | NULL                               | NULL    | NULL                                              | 64790 | 81.0     | Using where; Using temporary; Using filesort |
+| 1  | SIMPLE      | source_record     | NULL       | eq_ref | PRIMARY                            | PRIMARY                            | 8       | academic_retractions.publication.source_record_id | 1     | 100.0    | Using index                                  |
+| 1  | SIMPLE      | retraction_notice | NULL       | eq_ref | retraction_notice_source_record_uq | retraction_notice_source_record_uq | 8       | academic_retractions.publication.source_record_id | 1     | 90.0     | Using where                                  |
++----+-------------+-------------------+------------+--------+------------------------------------+------------------------------------+---------+---------------------------------------------------+-------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: publication_year, retraction_record_count DESC, p.publisher_name  (actual time=270..270 rows=4449 loops=1)
+    -> Stream results  (cost=51773 rows=1504) (actual time=113..264 rows=4449 loops=1)
+        -> Group aggregate: count(distinct source_record.source_record_id)  (cost=51773 rows=1504) (actual time=113..263 rows=4449 loops=1)
+            -> Nested loop inner join  (cost=45942 rows=58311) (actual time=113..242 rows=65909 loops=1)
+                -> Nested loop inner join  (cost=26343 rows=64790) (actual time=113..155 rows=65909 loops=1)
+                    -> Sort: `year(publication.original_paper_date)`, p.publisher_name  (cost=6744 rows=64790) (actual time=113..119 rows=65909 loops=1)
+                        -> Filter: ((publication.original_paper_date is not null) and (publication.publisher_name is not null))  (cost=6744 rows=64790) (actual time=0.0158..23.5 rows=65909 loops=1)
+                            -> Table scan on publication  (cost=6744 rows=64790) (actual time=0.0147..20 rows=65909 loops=1)
+                    -> Single-row covering index lookup on source_record using PRIMARY (source_record_id=publication.source_record_id)  (cost=0.25 rows=1) (actual time=453e-6..469e-6 rows=1 loops=65909)
+                -> Filter: (retraction_notice.retraction_date is not null)  (cost=0.25 rows=0.9) (actual time=0.00118..0.00123 rows=1 loops=65909)
+                    -> Single-row index lookup on retraction_notice using retraction_notice_source_record_uq (source_record_id=publication.source_record_id)  (cost=0.25 rows=1) (actual time=0.0011..0.00111 rows=1 loops=65909)
+

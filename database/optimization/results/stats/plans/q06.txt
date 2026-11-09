@@ -1,0 +1,37 @@
+-- q06. Number of records assigned each article-type label. (captured in round 1)
+
+SELECT
+    at.source_label AS article_type,
+    COUNT(DISTINCT sr.source_record_id) AS records_with_type
+FROM analyst_source_record AS sr
+JOIN analyst_publication AS p
+    ON p.source_record_id = sr.source_record_id
+JOIN analyst_publication_article_type_occurrence AS pato
+    ON pato.publication_id = p.publication_id
+JOIN analyst_article_type AS at
+    ON at.article_type_id = pato.article_type_id
+GROUP BY at.source_label
+ORDER BY records_with_type DESC, article_type;
+
+== EXPLAIN
++----+-------------+-------------------------------------+------------+--------+-------------------------------------------------------------+-----------------------------------------------------+---------+-------------------------------------------------------------------------+------+----------+----------------------------------------------+
+| id | select_type | table                               | partitions | type   | possible_keys                                               | key                                                 | key_len | ref                                                                     | rows | filtered | Extra                                        |
++----+-------------+-------------------------------------+------------+--------+-------------------------------------------------------------+-----------------------------------------------------+---------+-------------------------------------------------------------------------+------+----------+----------------------------------------------+
+| 1  | SIMPLE      | article_type                        | NULL       | index  | PRIMARY,article_type_source_label_uq                        | article_type_source_label_uq                        | 2050    | NULL                                                                    | 26   | 100.0    | Using index; Using temporary; Using filesort |
+| 1  | SIMPLE      | publication_article_type_occurrence | NULL       | ref    | PRIMARY,publication_article_type_occurrence_article_type_ix | publication_article_type_occurrence_article_type_ix | 8       | academic_retractions.article_type.article_type_id                       | 2605 | 100.0    | Using index                                  |
+| 1  | SIMPLE      | publication                         | NULL       | eq_ref | PRIMARY,publication_source_record_uq                        | PRIMARY                                             | 8       | academic_retractions.publication_article_type_occurrence.publication_id | 1    | 100.0    | NULL                                         |
+| 1  | SIMPLE      | source_record                       | NULL       | eq_ref | PRIMARY                                                     | PRIMARY                                             | 8       | academic_retractions.publication.source_record_id                       | 1    | 100.0    | Using index                                  |
++----+-------------+-------------------------------------+------------+--------+-------------------------------------------------------------+-----------------------------------------------------+---------+-------------------------------------------------------------------------+------+----------+----------------------------------------------+
+
+== EXPLAIN ANALYZE
+-> Sort: records_with_type DESC, `at`.article_type  (actual time=107..107 rows=26 loops=1)
+    -> Stream results  (cost=61015 rows=260) (actual time=0.96..107 rows=26 loops=1)
+        -> Group aggregate: count(distinct source_record.source_record_id)  (cost=61015 rows=260) (actual time=0.958..107 rows=26 loops=1)
+            -> Nested loop inner join  (cost=54241 rows=67738) (actual time=0.0401..92 rows=67738 loops=1)
+                -> Nested loop inner join  (cost=30533 rows=67738) (actual time=0.0383..57.3 rows=67738 loops=1)
+                    -> Nested loop inner join  (cost=6824 rows=67738) (actual time=0.0349..11.8 rows=67738 loops=1)
+                        -> Covering index scan on article_type using article_type_source_label_uq  (cost=2.85 rows=26) (actual time=0.00823..0.0182 rows=26 loops=1)
+                        -> Covering index lookup on publication_article_type_occurrence using publication_article_type_occurrence_article_type_ix (article_type_id=article_type.article_type_id)  (cost=11.9 rows=2605) (actual time=0.0114..0.366 rows=2605 loops=26)
+                    -> Single-row index lookup on publication using PRIMARY (publication_id=publication_article_type_occurrence.publication_id)  (cost=0.25 rows=1) (actual time=572e-6..587e-6 rows=1 loops=67738)
+                -> Single-row covering index lookup on source_record using PRIMARY (source_record_id=publication.source_record_id)  (cost=0.25 rows=1) (actual time=409e-6..425e-6 rows=1 loops=67738)
+
