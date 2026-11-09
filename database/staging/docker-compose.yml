@@ -1,0 +1,15 @@
+services:
+  mysql:
+    image: mysql:8.0.46
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set a disposable local MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: academic_retractions_staging
+    ports:
+      - "127.0.0.1:3307:3306"
+    restart: "no"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+      start_period: 180s

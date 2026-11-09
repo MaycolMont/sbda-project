@@ -19,7 +19,7 @@ from profile_dataset import EXPECTED_COLUMNS
 
 DATABASE_NAME = "academic_retractions_staging"
 INSERT_BATCH_SQL = """
-    INSERT INTO source_retraction_record (
+    INSERT INTO academic_retractions_staging.source_retraction_record (
         import_batch_id, source_row_number,
         record_id, original_paper_doi, retraction_doi, title, journal, publisher,
         primary_subject, subject_areas, primary_country, country, author_count,
@@ -72,7 +72,7 @@ def _mark_failed(connection, batch_id: str, message: str) -> None:
     try:
         cursor.execute(
             """
-            UPDATE import_batch
+            UPDATE academic_retractions_staging.import_batch
             SET import_status = 'failed',
                 import_finished_at_utc = %s,
                 error_message = %s
@@ -102,7 +102,7 @@ def load_csv(connection, path: Path, batch_id: str, batch_size: int = 500) -> in
     try:
         cursor.execute(
             """
-            INSERT INTO import_batch (
+            INSERT INTO academic_retractions_staging.import_batch (
                 import_batch_id, source_file_name, source_file_sha256,
                 source_file_size_bytes, import_started_at_utc, import_status
             ) VALUES (%s, %s, %s, %s, %s, 'loading')
@@ -133,7 +133,7 @@ def load_csv(connection, path: Path, batch_id: str, batch_size: int = 500) -> in
 
             cursor.execute(
                 """
-                UPDATE import_batch
+                UPDATE academic_retractions_staging.import_batch
                 SET source_row_count = %s,
                     import_status = 'completed',
                     import_finished_at_utc = %s

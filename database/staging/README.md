@@ -1,22 +1,35 @@
 # Raw staging import
 
 This is a lossless raw import boundary, not the normalized production schema.
-`001_create_staging.sql` targets MySQL 8.0 using InnoDB and `utf8mb4`; the exact
-minor version and Workbench version still need confirmation before deployment.
-The SQL avoids `CHECK` constraints for compatibility across MySQL 8.0 minor
-releases.
+`001_create_staging.sql` targets MySQL 8.0.46 using InnoDB and `utf8mb4`;
+Workbench 8.0 is the team's modeling client. The SQL avoids `CHECK` constraints
+for compatibility across MySQL 8.0 minor releases.
 
-From the repository root:
+For local integration tests, the optional Compose service pins MySQL 8.0.46 and
+binds only to loopback port 3307, avoiding the existing local MySQL service on
+3306. It has no persistent volume; `docker compose down` discards the test
+database with the container. In PowerShell from the repository root:
 
 ```powershell
 python -m pip install -r scripts\requirements.txt
-mysql --default-character-set=utf8mb4 -u <user> -p < database\staging\001_create_staging.sql
+$env:MYSQL_ROOT_PASSWORD = [guid]::NewGuid().ToString('N')
+docker compose -f database\staging\docker-compose.yml up -d --wait
 $env:MYSQL_HOST = "localhost"
-$env:MYSQL_PORT = "3306"
-$env:MYSQL_USER = "<user>"
-$env:MYSQL_PASSWORD = "<password>"
+$env:MYSQL_TEST_HOST = $env:MYSQL_HOST
+$env:MYSQL_PORT = "3307"
+$env:MYSQL_USER = "root"
+$env:MYSQL_PASSWORD = $env:MYSQL_ROOT_PASSWORD
+python tests\integration\test_staging_mysql.py
 python scripts\load_staging.py
+python scripts\run_etl.py --staging-batch-id <staging-batch-uuid>
+docker compose -f database\staging\docker-compose.yml down
 ```
+
+The integration test applies both the staging and production schema scripts to
+the disposable container and loads the tracked CSV through the staging and
+normalized ETL paths. For Workbench, connect to `127.0.0.1:3307` as `root` using
+the value in `MYSQL_ROOT_PASSWORD`, then open and review the schema scripts.
+Do not reuse a production password for this local disposable container.
 
 The loader uses the tracked CSV by default. Override it with
 `--input <path>` or choose an explicit UUID with `--batch-id <uuid>`. Each default
